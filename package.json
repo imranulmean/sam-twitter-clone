@@ -1,0 +1,23 @@
+{
+  "name": "sam-twitter-clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "twitter-clone-signup.js",
+  "type": "module",
+  "scripts": {
+    "signup": "nodemon twitter-clone-signup.js",
+    "signin": "nodemon twitter-clone-signin.js",
+    "createTweet": "nodemon create-tweet.js",
+    "tweetsByUserId": "nodemon tweets-by-userid.js",
+    "TwitterUserById": "nodemon twitter-user-by-id.js",
+    "likeTweet": "nodemon likeOrDislikeTweet.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.468.0",
+    "@aws-sdk/lib-dynamodb": "^3.468.0",
+    "bcryptjs": "^2.4.3"
+  }
+}
