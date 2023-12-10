@@ -10,7 +10,8 @@
     "createTweet": "nodemon create-tweet.js",
     "tweetsByUserId": "nodemon tweets-by-userid.js",
     "TwitterUserById": "nodemon twitter-user-by-id.js",
-    "likeTweet": "nodemon likeOrDislikeTweet.js",
+    "likeTweet": "nodemon like-Dislike-Tweet.js",
+    "follow": "nodemon follow-unfollow.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

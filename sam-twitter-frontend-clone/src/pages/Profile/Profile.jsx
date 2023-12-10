@@ -22,11 +22,22 @@ const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userTweets = await axios.get(`/tweets/user/all/${id}`);
-        const userProfile = await axios.get(`/users/find/${id}`);
+        /// Get Current User Tweets ////////
+        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
+        const timelineTweets= await fetch(getCurrentUserTweetUrl,{
+          method:"GET"
+        });
+        
+        const timelineTweetsData=await timelineTweets.json();
 
-        setUserTweets(userTweets.data);
-        setUserProfile(userProfile.data);
+        /// Get User Data ///////
+        const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
+        const findUser = await fetch(findsUserUrl,{
+          method:"GET"
+        });
+        const userData1=await findUser.json();
+        setUserTweets(timelineTweetsData.Items);
+        setUserProfile(userData1.Items[0]);
       } catch (err) {
         console.log("error", err);
       }

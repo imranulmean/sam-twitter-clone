@@ -21,6 +21,7 @@ const Tweet = ({ tweet, setData }) => {
     const fetchData = async () => {
       try {
         
+        /// Get User Data ///////
         const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${tweet.userId}`;
         const findUser = await fetch(findsUserUrl,{
           method:"GET"
@@ -39,10 +40,14 @@ const Tweet = ({ tweet, setData }) => {
     e.preventDefault();
 
     try {
-      const like = await axios.put(`/api/tweets/${tweet._id}/like`, {
-        id: currentUser._id,
-      });
-      
+      let likeObj={userId:tweet.userId, tweetId:tweet._id, userId2:currentUser._id};
+      console.log(likeObj);
+      const likeUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/like";
+      const likeData= await fetch(likeUrl,{
+        method:"POST",
+        body: JSON.stringify(likeObj)
+      })
+      console.log(likeData);
       if (location.includes("profile")) {
         const newData = await axios.get(`/api/tweets/user/all/${id}`);
         setData(newData.data);
@@ -51,8 +56,14 @@ const Tweet = ({ tweet, setData }) => {
         const newData = await axios.get(`/api/tweets/explore`);
         setData(newData.data);
       } else {
-        const newData = await axios.get(`/api/tweets/timeline/${currentUser._id}`);
-        setData(newData.data);
+        /// get Current User Tweets
+        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
+        const timelineTweets= await fetch(getCurrentUserTweetUrl,{
+          method:"GET"
+        });
+        
+        const timelineTweetsData=await timelineTweets.json();
+        setData(timelineTweetsData.Items);
       }
     } catch (err) {
       console.log("error", err);
