@@ -47,11 +47,40 @@ const Profile = () => {
   }, [currentUser, id]);
 
   const handleFollow = async () => {
+    console.log("currentUser_id", currentUser)
+    console.log("toFollowOrUnFollowId", id)
+    return;
+    try {
+      let followObj={
+        toFollowOrUnFollowId: id,
+        you: currentUser._id
+      };
+      const followUnfollowUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/follow-unfollow";
+      const followUnfollowData= await fetch(followUnfollowUrl, {
+        method: "POST",
+        body: JSON.stringify(followObj)
+      });
+      console.log(await followUnfollowData.json());
+      return;
+      dispatch(following(id));
+    } catch (err) {
+      console.log("error", err);
+    }
+
+    return;
     if (!currentUser.following.includes(id)) {
       try {
-        const follow = await axios.put(`/users/follow/${id}`, {
-          id: currentUser._id,
+        let followObj={
+          toFollowOrUnFollowId: id,
+          you: currentUser._id
+        };
+        const followUnfollowUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/follow-unfollow";
+        const followUnfollowData= await fetch(followUnfollowUrl, {
+          method: "POST",
+          body: JSON.stringify(followObj)
         });
+        console.log(await followUnfollowData.json());
+        return;
         dispatch(following(id));
       } catch (err) {
         console.log("error", err);
@@ -89,7 +118,7 @@ const Profile = () => {
               >
                 Edit Profile
               </button>
-            ) : currentUser.following.includes(id) ? (
+            ) : currentUser.following?.includes(id) ? (
               <button
                 className="px-4 -y-2 bg-blue-500 rounded-full text-white"
                 onClick={handleFollow}

@@ -6,10 +6,10 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
 
-const mainUserId="1702115625459"; /// You are going to follow this id
-const userId2="1702116038174"; /// userId2 is the Follower
+const toFollowOrUnFollowId="1702115625459"; /// You are going to follow this id
+const you="1702116038174"; /// userId2 is the Follower
 
-const likeObj={mainUserId,userId2}
+const likeObj={toFollowOrUnFollowId,you}
 
 const event1={
     body:JSON.stringify(likeObj)
@@ -19,10 +19,10 @@ const event1={
 export const handler = async (event) => {
   let result;
   
-  const {mainUserId,userId2}= JSON.parse(event.body);
+  const {toFollowOrUnFollowId,you}= JSON.parse(event.body);
     /////////////////// Getting Tweets by UserId ///////////
-    result= await followOrUnFollow(mainUserId, userId2);
-    console.log("showing result",result);
+    result= await followOrUnFollow(toFollowOrUnFollowId, you);
+    console.log("showing result/////////// Final",result);
     let response = {
       statusCode: 200,
       'headers': {
@@ -36,24 +36,50 @@ export const handler = async (event) => {
   
 };
 
-const followOrUnFollow = async(mainUserId, userId2) => {
+const followOrUnFollow = async(toFollowOrUnFollowId, you) => {
     let updateExpressionString;
-    const userData=await getTwitterUserById(mainUserId);
-    console.log(userData.Items[0].followers);
-
-     const isInFollowerList=userData.Items[0].followers.includes(userId2);
+    let toFollowOrUnFollowUserData;
+    let youUserData;
+    let removeFollowRes;
+    let removeFollowingRes;
+    let addFollowRes;
+    let addFollowingRes;
+    //Getting ToFollow User data////
+    toFollowOrUnFollowUserData=await getTwitterUserById(toFollowOrUnFollowId);
+    console.log("You are going to Follow:your ID",you);
+    console.log("toFollowOrUnFollowUserData:",toFollowOrUnFollowUserData.Items[0].followers);
+     const isInFollowerList= toFollowOrUnFollowUserData.Items[0].followers ? toFollowOrUnFollowUserData.Items[0].followers.includes(you) : false;
      console.log("isInFollowerList:",isInFollowerList);
-     if(isInFollowerList){
-        let followerIndex = userData.Items[0].followers.findIndex(i => i === userId2);
-        console.log("followerIndex:",followerIndex);
+
+    ////Getting You User data////
+    console.log("Following toFollowOrUnFollowId:",toFollowOrUnFollowId);
+    youUserData=await getTwitterUserById(you);
+    console.log("youUserData:",youUserData.Items[0].following);
+    let isInFollowingList = youUserData.Items[0].following ? youUserData.Items[0].following.includes(toFollowOrUnFollowId) : false;
+     console.log("isInFollowingList:",isInFollowingList);
+     
+
+     if(isInFollowerList && isInFollowingList){
+        let followerIndex = toFollowOrUnFollowUserData.Items[0].followers.findIndex(i => i === you);
         updateExpressionString = "REMOVE followers[" + followerIndex + "]";
-        return await removeFollow (updateExpressionString, mainUserId, userId2, userData)
+        removeFollowRes= await removeFollow (updateExpressionString, toFollowOrUnFollowId, you, toFollowOrUnFollowUserData);
+        //// Remove Following ////////
+        let followingIndex = youUserData.Items[0].following.findIndex(i => i === toFollowOrUnFollowId);
+        updateExpressionString = "REMOVE following[" + followingIndex + "]";
+        removeFollowingRes = await removeFollowing (updateExpressionString, toFollowOrUnFollowId, you, youUserData);
+        let obj={removeFollowRes, removeFollowingRes};
+        return obj;
+        
      }
      else{
         updateExpressionString='set followers = list_append(if_not_exists(followers, :emptyList), :follower)';
-        return await addFollow (updateExpressionString, mainUserId, userId2, userData)
+        addFollowRes= await addFollow (updateExpressionString, toFollowOrUnFollowId, you, toFollowOrUnFollowUserData);
+        updateExpressionString='set following = list_append(if_not_exists(following, :emptyList), :following)';
+        addFollowingRes= await addFollowing (updateExpressionString, toFollowOrUnFollowId, you, youUserData);  
+        let obj={addFollowRes, addFollowingRes};      
+        return obj;
      }
-
+     //////////////// Checking following List //////////
 }
 
 const getTwitterUserById = async (userId) =>{
@@ -76,34 +102,52 @@ const getTwitterUserById = async (userId) =>{
       }   
 }
 
-const addFollow = async (updateExpressionString, mainUserId, userId2, userData) => {
-    console.log("addig follow2----------", mainUserId);
-///////////////////Get Data From Existing ////////////////////////////////
-    ///////////////////////////////////////
+const addFollow = async (updateExpressionString, toFollowOrUnFollowId, you, userData) => {
     const command = new UpdateCommand(
         {
             TableName: 'twitterNewUsers', // Replace 'your-table-name' with your DynamoDB table name
             Key: {
-              '_id':mainUserId,
+              '_id':toFollowOrUnFollowId,
               email:userData.Items[0].email
             },
             UpdateExpression: updateExpressionString,
             ExpressionAttributeValues: {
               ':emptyList': [],
-              ':follower': [userId2] 
+              ':follower': [you] 
             },
             ReturnValues: 'ALL_NEW', // Adjust as needed
           }         
     );  
     return await docClient.send(command);
 }
-const removeFollow = async (updateExpressionString, mainUserId, userId2, userData) => {
+
+const addFollowing = async (updateExpressionString, toFollowOrUnFollowId, you, userData) => {
+///////////////////Get Data From Existing ////////////////////////////////
+  ///////////////////////////////////////
+  const command = new UpdateCommand(
+      {
+          TableName: 'twitterNewUsers', // Replace 'your-table-name' with your DynamoDB table name
+          Key: {
+            '_id':you,
+            email:userData.Items[0].email
+          },
+          UpdateExpression: updateExpressionString,
+          ExpressionAttributeValues: {
+            ':emptyList': [],
+            ':following': [toFollowOrUnFollowId] 
+          },
+          ReturnValues: 'ALL_NEW', // Adjust as needed
+        }         
+  );  
+  return await docClient.send(command);
+}
+const removeFollow = async (updateExpressionString, toFollowOrUnFollowId, you, userData) => {
         
     const command = new UpdateCommand(
         {
             TableName: 'twitterNewUsers', // Replace 'your-table-name' with your DynamoDB table name
             Key: {
-              '_id':mainUserId,
+              '_id':toFollowOrUnFollowId,
               email:userData.Items[0].email
             },
             UpdateExpression: updateExpressionString,
@@ -112,6 +156,24 @@ const removeFollow = async (updateExpressionString, mainUserId, userId2, userDat
     ); 
 
   return await docClient.send(command);
+
+}
+
+const removeFollowing = async (updateExpressionString, toFollowOrUnFollowId, you, userData) => {
+        
+  const command = new UpdateCommand(
+      {
+          TableName: 'twitterNewUsers', // Replace 'your-table-name' with your DynamoDB table name
+          Key: {
+            '_id':you,
+            email:userData.Items[0].email
+          },
+          UpdateExpression: updateExpressionString,
+          ReturnValues: 'ALL_NEW', // Adjust as needed
+        }         
+  ); 
+
+return await docClient.send(command);
 
 }
 
