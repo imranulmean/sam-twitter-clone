@@ -26,17 +26,11 @@ export const handler = async (event) => {
     const token=event.authorizationToken;
     if(token === "arn"){
       policy=genPolicy('allow', event.methodArn);
-      principalId="a1b1df1";
-      context={
-        simpleAuth:true
-      };
+      principalId="*";
     } else if( token === "narn"){
   
       policy=genPolicy('deny', event.methodArn);
-      principalId="a1b1df1";
-      context={
-        simpleAuth:true
-      };
+      principalId="*";
     }else {
       return response="Unauthorized Acces";
     }
