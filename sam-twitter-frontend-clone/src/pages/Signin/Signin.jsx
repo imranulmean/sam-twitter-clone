@@ -27,7 +27,14 @@ const Signin = () => {
         body: JSON.stringify(signinObj)
       })
       const loginData=await res.json();
-      dispatch(loginSuccess(loginData));
+
+      //////////Getting User Follower Data
+      const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
+      const findUser = await fetch(findsUserUrl,{
+        method:"GET"
+      });
+      const userProfile =await findUser.json();
+      dispatch(loginSuccess(userProfile.Items[0]));
       navigate("/");
     } catch (err) {
       dispatch(loginFailed());

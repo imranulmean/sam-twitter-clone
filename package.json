@@ -12,6 +12,7 @@
     "TwitterUserById": "nodemon twitter-user-by-id.js",
     "likeTweet": "nodemon like-Dislike-Tweet.js",
     "follow": "nodemon follow-unfollow.js",
+    "secure": "nodemon twitter-secure-api.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -19,6 +20,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.468.0",
     "@aws-sdk/lib-dynamodb": "^3.468.0",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }

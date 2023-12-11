@@ -49,7 +49,7 @@ const Profile = () => {
   const handleFollow = async () => {
     console.log("currentUser_id", currentUser)
     console.log("toFollowOrUnFollowId", id)
-    return;
+    
     try {
       let followObj={
         toFollowOrUnFollowId: id,
@@ -61,41 +61,12 @@ const Profile = () => {
         body: JSON.stringify(followObj)
       });
       console.log(await followUnfollowData.json());
-      return;
+      
       dispatch(following(id));
     } catch (err) {
       console.log("error", err);
     }
 
-    return;
-    if (!currentUser.following.includes(id)) {
-      try {
-        let followObj={
-          toFollowOrUnFollowId: id,
-          you: currentUser._id
-        };
-        const followUnfollowUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/follow-unfollow";
-        const followUnfollowData= await fetch(followUnfollowUrl, {
-          method: "POST",
-          body: JSON.stringify(followObj)
-        });
-        console.log(await followUnfollowData.json());
-        return;
-        dispatch(following(id));
-      } catch (err) {
-        console.log("error", err);
-      }
-    } else {
-      try {
-        const unfollow = await axios.put(`/users/unfollow/${id}`, {
-          id: currentUser._id,
-        });
-
-        dispatch(following(id));
-      } catch (err) {
-        console.log("error", err);
-      }
-    }
   };
 
   return (
