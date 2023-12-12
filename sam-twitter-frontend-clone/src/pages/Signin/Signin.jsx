@@ -3,21 +3,24 @@ import axios from "axios";
 
 import { useDispatch } from "react-redux";
 import { loginStart, loginSuccess, loginFailed } from "../../redux/userSlice";
-
+import { useSelector} from "react-redux";
 import { useNavigate } from "react-router-dom";
 import OAuth from '../../components/OAuth';
+
+
 
 const Signin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-
+  const [loading,setLoading]= useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     dispatch(loginStart());
+    setLoading(true);
     try {
       // const res = await axios.post("/api/auth/signin", { username, password });
       const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
@@ -27,6 +30,7 @@ const Signin = () => {
         body: JSON.stringify(signinObj)
       })
       const loginData=await res.json();
+      setLoading(false);
       //////////Getting User Follower Data
       const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
       const findUser = await fetch(findsUserUrl,{
@@ -35,7 +39,7 @@ const Signin = () => {
           Authorization:loginData.token
         }
       });
-
+      
       const userProfile =await findUser.json();
       userProfile.Items[0]["token"]=loginData.token;
       dispatch(loginSuccess(userProfile.Items[0]));
@@ -93,14 +97,14 @@ const Signin = () => {
         placeholder="password"
         className="text-xl py-2 rounded-full px-4"
       />
-
+      { !loading ?   
       <button
         className="text-xl py-2 rounded-full px-4 bg-blue-500 text-white"
         onClick={handleLogin}
       >
         Sign in
-      </button>
-
+       </button> : <button>Signing in</button>
+      }
       <p className="text-center text-xl">Don't have an account?</p>
 
       {/* <input

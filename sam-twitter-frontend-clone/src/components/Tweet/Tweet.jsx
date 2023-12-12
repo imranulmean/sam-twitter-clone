@@ -59,8 +59,13 @@ const Tweet = ({ tweet, setData }) => {
         setData(newData.data);
       } else if (location.includes("explore")) {
 
-        const newData = await axios.get(`/api/tweets/explore`);
-        setData(newData.data);
+        const newData = await fetch(`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/explore`,{
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
+        });
+        setData(await newData.json());
       } else {
         /// get Current User Tweets
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;

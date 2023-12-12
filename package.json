@@ -13,6 +13,7 @@
     "likeTweet": "nodemon like-Dislike-Tweet.js",
     "follow": "nodemon follow-unfollow.js",
     "secure": "nodemon twitter-secure-api.js",
+    "explore": "nodemon twitter-explore-tweets.js",    
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
