@@ -1,37 +1,23 @@
 import jwt from "jsonwebtoken";
 
 ////////////////////
-
-const name="john doe"; /// You are going to follow this id
-const origin="http://localhost:5173"; /// userId2 is the Follower
-
-const tokenObj={name,origin}
-
 const event1={
-    authorizationToken:tokenObj
+    authorizationToken:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUxNzMiLCJpYXQiOjE3MDIzNjM3OTd9.rqgZ2Nki82yhQLM5ZJkHLL54eP5XbMv0qz-QE_GCDEs",
+    methodArn:"123456"
 }
 ///////////////////////
 
 export const handler = async (event) => {
-
-    const token=event.authorizationToken;
-    console.log(token);
-    // const token= jwt.sign(tokenObj,"twitter-clone");
-    // console.log("encoded Token", token);
-    // const decoded=jwt.verify(token,"twitter-clone");
-    // console.log("Decoded Token:",decoded);
-
+    const origin="http://localhost:5173";
+    let tokenSecret="twitter-clone-token";
     let response, policy, principalId, context;
-  
     const token=event.authorizationToken;
-    if(token === "arn"){
+    const decodedToken=jwt.verify(token,tokenSecret);
+  if(decodedToken.origin === origin){
       policy=genPolicy('allow', event.methodArn);
       principalId="*";
-    } else if( token === "narn"){
-  
-      policy=genPolicy('deny', event.methodArn);
-      principalId="*";
-    }else {
+    } else {
+      
       return response="Unauthorized Acces";
     }
     
@@ -51,11 +37,11 @@ const genPolicy = (effect, resource) =>{
     const stmt={};
     stmt.Action="execute-api:Invoke";
     stmt.Effect=effect;
-    stmt.Resource=["arn:aws:execute-api:us-east-1:201814457761:0ko7jyglbb/*/POST/mern-state-auth-signip",
-                  "arn:aws:execute-api:us-east-1:201814457761:0ko7jyglbb/*/POST/mern-state-auth-signip/*"
-                  ];
+    // stmt.Resource=["arn:aws:execute-api:us-east-1:201814457761:0ko7jyglbb/*/POST/mern-state-auth-signip",
+    //               "arn:aws:execute-api:us-east-1:201814457761:0ko7jyglbb/*/POST/mern-state-auth-signip/*"
+    //               ];
   
-    //stmt.Resource=resource;
+    stmt.Resource=resource;
     policy.Statement.push(stmt);
     return policy;    
 }

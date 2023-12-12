@@ -2,10 +2,12 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 
 import { useLocation, useParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 const UserPlaceholder = ({ setUserData, userData }) => {
   const { id } = useParams();
   const location = useLocation().pathname;
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,7 +15,10 @@ const UserPlaceholder = ({ setUserData, userData }) => {
         /// Get User Data ///////
         const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
         const findUser = await fetch(findsUserUrl,{
-          method:"GET"
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
         });
         const userProfile =await findUser.json();
         console.log(userProfile);

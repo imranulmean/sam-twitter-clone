@@ -1,12 +1,13 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 ///////////////////////
-const email="testfahad@gmail.com";
+const email="test001@gmail.com";
 const password="123";
 
 const signupObj={email,password}
@@ -31,15 +32,17 @@ export const handler = async (event) => {
    ////////////// If the User Exist check password ///////////////// 
     
    if(result.Count==1){ 
+        let origin="http://localhost:5173"; 
+        let tokenObj={origin};
+        let tokenSecret="twitter-clone-token";
         result = await checkPassword(password, result.Items[0]);
-        console.log(result);
+        result["token"]=jwt.sign(tokenObj,tokenSecret);
     }
     
     else{
         result="User Do Not Existis";
     }
-    //console.log(result);
-    
+
     let response = {
       statusCode: 200,
       'headers': {

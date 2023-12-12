@@ -24,7 +24,10 @@ const Tweet = ({ tweet, setData }) => {
         /// Get User Data ///////
         const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${tweet.userId}`;
         const findUser = await fetch(findsUserUrl,{
-          method:"GET"
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
         });
         const userData1=await findUser.json();
         setUserData(userData1.Items[0]);
@@ -45,6 +48,9 @@ const Tweet = ({ tweet, setData }) => {
       const likeUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/like";
       const likeData= await fetch(likeUrl,{
         method:"POST",
+        headers:{
+          Authorization:currentUser.token
+        },        
         body: JSON.stringify(likeObj)
       })
       console.log(likeData);
@@ -59,7 +65,10 @@ const Tweet = ({ tweet, setData }) => {
         /// get Current User Tweets
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
-          method:"GET"
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
         });
         
         const timelineTweetsData=await timelineTweets.json();

@@ -15,7 +15,10 @@ const TimelineTweet = () => {
         /// Get Current User Tweets ////////
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
-          method:"GET"
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
         });
         
         const timelineTweetsData=await timelineTweets.json();

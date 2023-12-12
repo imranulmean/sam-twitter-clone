@@ -21,11 +21,15 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("currentUser_id", currentUser)
       try {
         /// Get Current User Tweets ////////
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
-          method:"GET"
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
         });
         
         const timelineTweetsData=await timelineTweets.json();
@@ -33,7 +37,10 @@ const Profile = () => {
         /// Get User Data ///////
         const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
         const findUser = await fetch(findsUserUrl,{
-          method:"GET"
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
         });
         const userData1=await findUser.json();
         setUserTweets(timelineTweetsData.Items);
@@ -58,6 +65,9 @@ const Profile = () => {
       const followUnfollowUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/follow-unfollow";
       const followUnfollowData= await fetch(followUnfollowUrl, {
         method: "POST",
+        headers:{
+          Authorization:currentUser.token
+        },
         body: JSON.stringify(followObj)
       });
       console.log(await followUnfollowData.json());
