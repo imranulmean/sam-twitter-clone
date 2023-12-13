@@ -7,6 +7,7 @@ import Tweet from "../Tweet/Tweet";
 const ExploreTweets = () => {
   const [explore, setExplore] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
+  const [loading, setLoading]= useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,6 +21,7 @@ const ExploreTweets = () => {
         })
         const exploreTweetsRes= await exploreTweetsData.json();
         setExplore(exploreTweetsRes);
+        setLoading(false);
       } catch (err) {
         console.log("error", err);
       }
@@ -27,16 +29,23 @@ const ExploreTweets = () => {
     fetchData();
   }, [currentUser._id]);
   return (
-    <div className="mt-6">
-      {explore &&
-        explore.map((tweet) => {
-          return (
-            <div key={tweet._id} className="p-2">
-              <Tweet tweet={tweet} setData={setExplore} />
-            </div>
-          );
-        })}
-    </div>
+    <>
+      {
+      
+        loading ? <button className="bg-slate-500">Loading Data ....</button> : 
+        <div className="mt-6">
+        {explore &&
+          explore.map((tweet) => {
+            return (
+              <div key={tweet._id} className="p-2">
+                <Tweet tweet={tweet} setData={setExplore} />
+              </div>
+            );
+          })}
+      </div>
+      }
+
+    </>
   );
 };
 

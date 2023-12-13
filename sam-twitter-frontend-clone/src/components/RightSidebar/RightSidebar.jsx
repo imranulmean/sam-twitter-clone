@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
   return (
@@ -8,6 +9,7 @@ const RightSidebar = () => {
       <p className="font-bold">#hufflepuff</p>
       <p className="font-bold">#slytherin</p>
       <p className="font-bold">#ravenclaw</p>
+      <Link to ="twitterNotification">Notification Page</Link>
     </div>
   );
 };

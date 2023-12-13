@@ -18,9 +18,10 @@ const Profile = () => {
 
   const { id } = useParams();
   const dispatch = useDispatch();
+  const [loading, setLoading]=useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => {     
       console.log("currentUser_id", currentUser)
       try {
         /// Get Current User Tweets ////////
@@ -43,6 +44,7 @@ const Profile = () => {
           }
         });
         const userData1=await findUser.json();
+        setLoading(false);
         setUserTweets(timelineTweetsData.Items);
         setUserProfile(userData1.Items[0]);
       } catch (err) {
@@ -81,7 +83,9 @@ const Profile = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-4">
+    { 
+    loading ? <button className="bg-yellow-800">Loading Data ....</button> : 
+        <div className="grid grid-cols-1 md:grid-cols-4">
         <div className="px-6">
           <LeftSidebar />
         </div>
@@ -130,7 +134,8 @@ const Profile = () => {
         <div className="px-6">
           <RightSidebar />
         </div>
-      </div>
+      </div>    
+    }
       {open && <EditProfile setOpen={setOpen} />}
     </>
   );

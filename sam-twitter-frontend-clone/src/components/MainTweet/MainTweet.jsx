@@ -11,7 +11,6 @@ const MainTweet = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(currentUser);
     const createTweetObj={
       userId: currentUser._id,
       description: tweetText,

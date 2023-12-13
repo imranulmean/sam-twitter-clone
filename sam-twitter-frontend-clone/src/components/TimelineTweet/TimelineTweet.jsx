@@ -6,9 +6,8 @@ import Tweet from "../Tweet/Tweet";
 
 const TimelineTweet = () => {
   const [timeLine, setTimeLine] = useState(null);
-
   const { currentUser } = useSelector((state) => state.user);
-
+  const [loading, setLoading]=useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,6 +21,7 @@ const TimelineTweet = () => {
         });
         
         const timelineTweetsData=await timelineTweets.json();
+        setLoading(false);
         setTimeLine(timelineTweetsData.Items);
       } catch (err) {
         console.log("error", err);
@@ -31,18 +31,23 @@ const TimelineTweet = () => {
     fetchData();
   }, [currentUser._id]);
 
-  console.log("Timeline", timeLine);
   return (
-    <div className="mt-6">
-      {timeLine &&
-        timeLine.map((tweet) => {
-          return (
-            <div key={tweet._id} className="p-2">
-              <Tweet tweet={tweet} setData={setTimeLine} />
-            </div>
-          );
-        })}
-    </div>
+    <>
+      {
+        loading ? <button className="bg-slate-500">Loading Data</button> :
+          <div className="mt-6">
+          {timeLine &&
+            timeLine.map((tweet) => {
+              return (
+                <div key={tweet._id} className="p-2">
+                  <Tweet tweet={tweet} setData={setTimeLine} />
+                </div>
+              );
+            })}
+        </div>        
+      
+      }
+    </>
   );
 };
 
