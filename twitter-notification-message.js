@@ -34,15 +34,14 @@ const docClient = DynamoDBDocumentClient.from(client);
         };
         let postCommand = new PostToConnectionCommand(requestParams);
         try {
-            await client.send(postCommand);
-            return {
-              statusCode: 200,
-            };            
+            await client.send(postCommand);           
         } catch (error) {
         console.log(error);
         }        
     }
-
+    return {
+        statusCode: 200,
+      }; 
   };
 
 const getConnections = async () =>{
