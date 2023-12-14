@@ -14,7 +14,10 @@
     "follow": "nodemon follow-unfollow.js",
     "secure": "nodemon twitter-secure-api.js",
     "explore": "nodemon twitter-explore-tweets.js",
-    "updateUser": "nodemon twitter-update-user.js",    
+    "updateUser": "nodemon twitter-update-user.js",
+    "twitterNotificationConnection": "nodemon twitter-notification-connect.js",
+    "twitterNotificationMessage": "nodemon twitter-notification-message.js",
+    "twitterNotificationDis": "nodemon twitter-notification-disconnect.js",    
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -25,10 +25,11 @@ export const handler = async (event) => {
   const formatedDate=new Date(createdAt);
   const year=formatedDate.getFullYear().toString();
   const month=formatedDate.getMonth() + 1;
-  const day=formatedDate.getDay(); 
-  console.log(createdAt);
-  console.log(`${day}-${month}-${year}`);
+  const date=formatedDate.getDate().toString();
   
+  console.log(createdAt);
+  console.log(`${date}-${month}-${year}`);
+
     /////////////////// Creat Tweet with userId and description ///////////
     result=await createTweet(_id, userId, description, createdAt, updatedAt);
     putDataIn_tweetByDates(_id, userId, createdAt, year);
