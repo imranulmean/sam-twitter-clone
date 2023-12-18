@@ -12,10 +12,21 @@ import { ReceiveMessageCommand, SQSClient, DeleteMessageCommand, DeleteMessageBa
 const connectionId= 'P-Fw7cj5oAMCIoQ=';
 
 const event1={
-  requestContext:{
-      connectionId:connectionId
-  }
-}
+    Records: [
+        {
+          messageId: '7eb78125-e09c-4fef-bc4b-1432a1388661',
+          receiptHandle: 'AQEBkk/4KSKQE4bqHs8gt/KHx3MYApljajci0FfGC/GIhmbNo7fWkmtCnG+qC72boQQsw58tg3ytIt6p1LGEnOJfWXSigs+IAuOORNHYiY36t9mviYVp8G1bgbyyfBtziaq8HG1RD9Tu3Q6JYeU1HhcBoAJv48rGUR6D0+0ueHCk00gfZR1QJCBaz9YYrgHK3ju2LCdMiX6+/DeFtrnliJxRvNPkHcjksf1MPCZ74fAqS9QhmuQLShBYALEz8P1p31pJITbUOwiz87eWsva1I0QlS9lDkqQTgFZ2EGJiKydOhE7blLV6RsoNlJ/J8OyVBU9KaOUuTtzT45WURiTKJ7RMZT6LtL1lA7Vgg9LH0ENLsb27EyBN+gFYAgtAaVlDIjXGrnB8yt1LdROD9O4U6aHxtA==',
+          body: '{"userId":"1702115625459","tweetId":"1702125247245","type":"liked"}',
+          attributes: [Object],
+          messageAttributes: {},
+          md5OfBody: '3a79661fef2b2e901774b706ae1059f7',
+          eventSource: 'aws:sqs',
+          eventSourceARN: 'arn:aws:sqs:us-east-1:201814457761:twitter-notification-sqs',
+          awsRegion: 'us-east-1'
+        }
+      ]    
+  };
+
 /////////////////////////////////
 
 const dynamoDbclient = new DynamoDBClient({});
@@ -29,40 +40,23 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
 
   export const handler = async (event) => {
     let connectionIds;
-    console.log(event);
-    const messages = await readTwitter_sqs();
-    console.log(messages);
+    // console.log(event);
+    const messages = event.Records;
+   // console.log(messages);
 
     if (!messages) {
       return;
     }
-    if (messages.length === 1) {
-      console.log(messages[0].Body);
-      await sqsClient.send(
-        new DeleteMessageCommand({
-          QueueUrl: sqsQueueUrl,
-          ReceiptHandle: messages[0].ReceiptHandle,
-        }),
-      );
-    }
-    else {
-      await sqsClient.send(
-        new DeleteMessageBatchCommand({
-          QueueUrl: sqsQueueUrl,
-          Entries: messages.map((message) => ({
-            Id: message.MessageId,
-            ReceiptHandle: message.ReceiptHandle,
-          })),
-        }),
-      );
-    }        
-
+       
     ///// Getting Connections from Dynamo DB /////////
       connectionIds = await getConnections(); 
 
       while(messages.length>0){
-        let m=messages.pop();
-        let messageBody=JSON.parse(m.Body);
+        let m=messages.pop();       
+        let messageBody=JSON.parse(m.body);
+        console.log("Showing Message Body");
+        console.log(messageBody);
+
         if(messageBody.type === "liked"){
             for (let c of connectionIds.Items){
               if(messageBody.userId === c.userId){
@@ -105,17 +99,6 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
       }; 
   };
 
-  const readTwitter_sqs= async () =>{
-    let command= new ReceiveMessageCommand({
-      QueueUrl: sqsQueueUrl,
-      WaitTimeSeconds: 10,
-      MaxNumberOfMessages: 10,
-    });
-    let {Messages}= await sqsClient.send(command);
-    //console.log(Messages);
-    return Messages;
-  }
-
 const getConnections = async () =>{
     const createdAt=new Date().toISOString();
     const formatedDate=new Date(createdAt);
@@ -132,17 +115,10 @@ const getConnections = async () =>{
         ConsistentRead: true,
     });
     const getConnections= await docClient.send(command);
+    console.log("Showing Connections");
+    console.log(getConnections);
+
     return getConnections;
-
-
-    // let command= new ReceiveMessageCommand({
-    //   QueueUrl: connectionSqsUrl,
-    //   WaitTimeSeconds: 10,
-    //   MaxNumberOfMessages: 10,
-    // });
-    // let getConnections= await sqsClient.send(command);
-    // return getConnections;  
-
 }
 
 

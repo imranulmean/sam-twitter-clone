@@ -1,8 +1,6 @@
 import { DynamoDBClient, UpdateItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { PutCommand, QueryCommand, UpdateCommand ,DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
 ////////////////////
 
@@ -15,6 +13,11 @@ const event1={
     body:JSON.stringify(likeObj)
 }
 ///////////////////////
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+const sqsClient = new SQSClient({});
+const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-notification-sqs";
 
 export const handler = async (event) => {
   let result;
@@ -117,7 +120,8 @@ const addFollow = async (updateExpressionString, toFollowOrUnFollowId, you, user
             },
             ReturnValues: 'ALL_NEW', // Adjust as needed
           }         
-    );  
+    );
+    await insertData_sqs (toFollowOrUnFollowId, you);
     return await docClient.send(command);
 }
 
@@ -175,6 +179,18 @@ const removeFollowing = async (updateExpressionString, toFollowOrUnFollowId, you
 
 return await docClient.send(command);
 
+}
+
+const insertData_sqs = async(toFollowOrUnFollowId, you) =>{
+  let mesgObj={toFollowOrUnFollowId, you, type:'followed'};
+  let command = new SendMessageCommand({
+    QueueUrl: sqsQueueUrl,    
+    MessageBody:JSON.stringify(mesgObj),
+  });
+
+  let response = await sqsClient.send(command);
+  console.log(response);
+  return response;
 }
 
 await handler(event1);

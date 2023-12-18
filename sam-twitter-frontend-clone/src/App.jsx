@@ -7,11 +7,11 @@ import Explore from "./pages/Explore/Explore";
 import Signin from "./pages/Signin/Signin";
 import Navbar from "./components/Navbar/Navbar";
 import Error from "./pages/Error/Error";
-import TwitterNotification from "./pages/twitter-notification";
 
 const Layout = () => {
   return (
-    <div className="md:w-8/12 mx-auto">
+    // <div className="md:w-8/12 mx-auto">
+    <div className="w-full mx-auto">
       <Navbar />
       <Outlet></Outlet>
     </div>
@@ -43,11 +43,7 @@ const router = createBrowserRouter([
       {
         path: "/signout",
         element: <Signin />,
-      },
-      {
-        path: "/twitterNotification",
-        element: <TwitterNotification />,
-      }      
+      }     
     ],
   },
 ]);

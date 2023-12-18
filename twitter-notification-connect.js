@@ -1,5 +1,6 @@
 import { CreateTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
 //////////////////////////////
     const connectionId= 'P6zc0daGoAMCJDQ=';
@@ -10,20 +11,20 @@ import { PutCommand, QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-d
   const event1={
     requestContext:{
         connectionId:connectionId,
-        queryStringParameters:queryStringParameters
-    }
+    },
+    queryStringParameters:queryStringParameters    
 }
 /////////////////////////////////
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
-
+const connectionSqsUrl="https://sqs.us-east-1.amazonaws.com/201814457761/twitter-connections-sqs";
+const sqsClient = new SQSClient({});
 
 export const handler = async (event) => {
-    console.log(event);
-    // const eventData= JSON.parse(event.queryStringParameters.extraData);
-    // console.log(eventData._id);
-     return;
+    // console.log(event);
+    const eventData=JSON.parse(event.queryStringParameters.extraData);
+     console.log(eventData);
     let result;
   const command = new CreateTableCommand({
     TableName: "twitter-notification",
@@ -58,12 +59,12 @@ export const handler = async (event) => {
     //// Creating table and putting data////////
     const response = await client.send(command);
     console.log(response);
-    result=await putData_twitterNotification(event.requestContext.connectionId);
+   // result=await putData_twitterNotification(event.requestContext.connectionId);
 
   } catch (error) {
 
     ///////// Table Already Exists now putting data ///////
-    result=await putData_twitterNotification(event.requestContext.connectionId);
+    result=await putData_twitterNotification(event.requestContext.connectionId,eventData._id);    
     console.log(result);
   }
     return {
@@ -71,7 +72,7 @@ export const handler = async (event) => {
     };
 };
 
-const putData_twitterNotification = async(connectionId) =>{
+const putData_twitterNotification = async(connectionId,userId) =>{
     const createdAt=new Date().toISOString();
     const formatedDate=new Date(createdAt);
     const year=formatedDate.getFullYear().toString();
@@ -83,7 +84,8 @@ const putData_twitterNotification = async(connectionId) =>{
         TableName:"twitter-notification",
         Item:{
             connectionDate:connectionDate,
-            connectionId:connectionId
+            connectionId:connectionId,
+            userId:userId
         }
     });
     try {

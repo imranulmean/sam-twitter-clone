@@ -3,57 +3,74 @@ import app from "../firebase";
 import { useDispatch } from 'react-redux';
 import { loginStart, loginSuccess, loginFailed } from "../redux/userSlice";
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 
 export default function OAuth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading,setLoading]= useState(false);
+
   const handleGoogleClick = async () => {
     try {
+      dispatch(loginStart());
+      setLoading(true);      
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);
 
-      const fireBaseGoogleResult = await signInWithPopup(auth, provider);
-      await AWSCognitoId(fireBaseGoogleResult);      
-       return; 
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: result.user.displayName,
-          email: result.user.email,
-          photo: result.user.photoURL,
-        }),
-      });
-      const data = await res.json();
-      dispatch(loginStart());
-      navigate('/');
+      const {_tokenResponse} = await signInWithPopup(auth, provider);
+      console.log(_tokenResponse);
+      const email=_tokenResponse.email;
+      const profilePicture=_tokenResponse.photoUrl;
+      const type="google";
+///////////////////////
+        try {
+          // const res = await axios.post("/api/auth/signin", { username, password });
+          const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
+          const signinObj={email,profilePicture,type};
+
+          const res= await fetch(twitterSigninUrl,{
+            method:"POST",
+            body: JSON.stringify(signinObj)
+          })
+          const loginData=await res.json();         
+          //////////Getting User Follower Data
+          const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
+          const findUser = await fetch(findsUserUrl,{
+            method:"GET",
+            headers:{
+              Authorization:loginData.token
+            }
+          });
+          
+          const userProfile =await findUser.json();
+          setLoading(false);
+          userProfile.Items[0]["token"]=loginData.token;
+          console.log(userProfile.Items[0]);
+          dispatch(loginSuccess(userProfile.Items[0]));
+          navigate("/");
+        } catch (err) {
+          dispatch(loginFailed());
+        }      
+////////////////////////
+      
     } catch (error) {
       console.log('could not sign in with google', error);
     }
   };
 
-  const AWSCognitoId= async(fireBaseGoogleResult) =>{
-
-    //console.log('googleResult._tokenResponse.oauthIdToken',fireBaseGoogleResult._tokenResponse.oauthIdToken);  
-    console.log(fireBaseGoogleResult);
-    const twitterSigninURL = "https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
-    const twitterSigninData= await fetch(twitterSigninURL);
-    console.log(await twitterSigninData.json());
-}
-
-
   return (
     <>
+    {
+     !loading ? 
       <button
         onClick={handleGoogleClick}
         type='button'
         className='bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-95'
-      >
+        >
         Login With google
-      </button>  
+      </button> : <button>Authenticating Wait ....</button>
+    } 
     </>
   );
 }

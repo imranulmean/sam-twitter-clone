@@ -1,8 +1,8 @@
 import { CreateTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, QueryCommand, DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-
+import { ReceiveMessageCommand, SQSClient, DeleteMessageCommand, DeleteMessageBatchCommand } from "@aws-sdk/client-sqs";
 //////////////////////////////
-    const connectionId= 'P6-uzdnSIAMCFuw=';
+    const connectionId= 'P98_uc8KoAMCLig=';
 
   const event1={
     requestContext:{
@@ -13,7 +13,8 @@ import { PutCommand, QueryCommand, DeleteCommand, DynamoDBDocumentClient } from 
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
-
+const connectionSqsUrl="https://sqs.us-east-1.amazonaws.com/201814457761/twitter-connections-sqs";
+const sqsClient = new SQSClient({});
 
 export const handler = async (event) => {
     console.log(event);
@@ -23,7 +24,19 @@ export const handler = async (event) => {
     const date=formatedDate.getDate().toString();
     const connectionDate=`${year}`;
 
-    let result;
+    // let {Messages}= await readTwitterConnections_sqs();
+    // console.log(Messages);
+    // if(Messages)
+    // for( let m of Messages){
+    //     let messageBody=JSON.parse(m.Body);
+    //     if(messageBody.connectionId === event.requestContext.connectionId){
+    //         await sqsClient.send(new DeleteMessageCommand ({
+    //             QueueUrl: connectionSqsUrl,
+    //             ReceiptHandle: m.ReceiptHandle,                
+    //         }));
+    //     }
+    // }
+
     let command= new DeleteCommand({
         TableName:"twitter-notification",
         Key:{
@@ -33,7 +46,7 @@ export const handler = async (event) => {
     });
 
     try{
-        result= await docClient.send(command);
+       let result= await docClient.send(command);
         console.log(result);
     }
     catch (error){
@@ -44,4 +57,14 @@ export const handler = async (event) => {
     }
 };
 
+const readTwitterConnections_sqs= async () =>{
+    let command= new ReceiveMessageCommand({
+      QueueUrl: connectionSqsUrl,
+      WaitTimeSeconds: 10,
+      MaxNumberOfMessages: 10,
+      
+    });
+    let readSqsRes= await sqsClient.send(command);
+    return readSqsRes;
+  }
 handler(event1);

@@ -6,10 +6,11 @@ import axios from "axios";
 
 const MainTweet = () => {
   const [tweetText, setTweetText] = useState("");
-
   const { currentUser } = useSelector((state) => state.user);
+  const [loading, setLoading]= useState(false);
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const createTweetObj={
       userId: currentUser._id,
@@ -21,6 +22,7 @@ const MainTweet = () => {
         method:"POST",
         body: JSON.stringify(createTweetObj)
       });
+      setLoading(false);
       window.location.reload(false);
     } catch (err) {
       console.log(err);
@@ -41,12 +43,16 @@ const MainTweet = () => {
           maxLength={280}
           className="bg-slate-200 rounded-lg w-full p-2"
         ></textarea>
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-500 text-white py-2 px-4 rounded-full ml-auto"
-        >
-          Tweet
-        </button>
+        {
+          !loading ?
+            <button
+            onClick={handleSubmit}
+            className="bg-blue-500 text-white py-2 px-4 rounded-full ml-auto"
+          >
+            Create Tweet
+          </button> : <button>Tweeting for you </button> 
+        }
+
       </form>
       <TimelineTweet />
     </div>

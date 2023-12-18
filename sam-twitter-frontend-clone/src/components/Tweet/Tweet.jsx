@@ -11,8 +11,8 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 
 const Tweet = ({ tweet, setData }) => {
   const { currentUser } = useSelector((state) => state.user);
-
   const [userData, setUserData] = useState();
+  const [liking,setLiking] = useState(false);
 
   const dateStr = formatDistance(new Date(tweet.createdAt), new Date());
   const location = useLocation().pathname;
@@ -41,7 +41,7 @@ const Tweet = ({ tweet, setData }) => {
 
   const handleLike = async (e) => {
     e.preventDefault();
-
+    setLiking(true);
     try {
       let likeObj={userId:tweet.userId, tweetId:tweet._id, userId2:currentUser._id};
       console.log(likeObj);
@@ -53,10 +53,19 @@ const Tweet = ({ tweet, setData }) => {
         },        
         body: JSON.stringify(likeObj)
       })
-      console.log(likeData);
-      if (location.includes("profile")) {
-        const newData = await axios.get(`/api/tweets/user/all/${id}`);
-        setData(newData.data);
+      setLiking(false);
+
+      if (location.includes("profile")) {        
+        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
+        const timelineTweets= await fetch(getCurrentUserTweetUrl,{
+          method:"GET",
+          headers:{
+            Authorization:currentUser.token
+          }
+        });
+        
+        const timelineTweetsData=await timelineTweets.json();
+        setData(timelineTweetsData.Items);
       } else if (location.includes("explore")) {
 
         const newData = await fetch(`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/explore`,{
@@ -100,14 +109,18 @@ const Tweet = ({ tweet, setData }) => {
           <p>Tweet User Id: {tweet.userId}</p>
           <p>Tweet Id: {tweet._id}</p>
           <p>{tweet.description}</p>
-          <button onClick={handleLike}>
-            {tweet.likes.includes(currentUser._id) ? (
-              <FavoriteIcon className="mr-2 my-2 cursor-pointer"></FavoriteIcon>
-            ) : (
-              <FavoriteBorderIcon className="mr-2 my-2 cursor-pointer"></FavoriteBorderIcon>
-            )}
-            {tweet.likes.length}
-          </button>
+          {
+            liking ? <button>Liking....</button> : 
+              <button onClick={handleLike}>
+                {tweet.likes.includes(currentUser._id) ? (
+                  <FavoriteIcon className="mr-2 my-2 cursor-pointer"></FavoriteIcon>
+                ) : (
+                  <FavoriteBorderIcon className="mr-2 my-2 cursor-pointer"></FavoriteBorderIcon>
+                )}
+                {tweet.likes.length}
+             </button>            
+          }
+
         </>
       )}
     </div>
