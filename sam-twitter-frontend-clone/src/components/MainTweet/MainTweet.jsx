@@ -10,8 +10,12 @@ const MainTweet = () => {
   const [loading, setLoading]= useState(false);
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    if(tweetText===''){
+      alert("please write something")
+      return;
+    }      
+    setLoading(true);    
     const createTweetObj={
       userId: currentUser._id,
       description: tweetText,
