@@ -19,6 +19,7 @@
     "twitterNotificationMessage": "nodemon twitter-notification-message.js",
     "twitterNotificationMessageLambda": "nodemon twitter-notification-message-LambdaTriggers.js",    
     "twitterNotificationDis": "nodemon twitter-notification-disconnect.js",
+    "deleteTweet": "nodemon twitter-delete-tweet.js",    
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

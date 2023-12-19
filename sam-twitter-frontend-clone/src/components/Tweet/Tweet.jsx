@@ -1,22 +1,21 @@
 import axios from "axios";
 import React, { useState } from "react";
 import formatDistance from "date-fns/formatDistance";
-
 import { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-const Tweet = ({ tweet, setData }) => {
+const Tweet = ({ tweet, setData, }) => {
+  
   const { currentUser } = useSelector((state) => state.user);
   const [userData, setUserData] = useState();
   const [liking,setLiking] = useState(false);
-
   const dateStr = formatDistance(new Date(tweet.createdAt), new Date());
   const location = useLocation().pathname;
   const { id } = useParams();
+  const [deleting, setDeleting]= useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -93,6 +92,21 @@ const Tweet = ({ tweet, setData }) => {
     }
   };
 
+  const deleteTweet = async (userId, tweetId) => {
+    setDeleting(true);
+    const deleteTweetUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/deleteTweet";
+    const deleteTweetObj={userId, tweetId}
+    const deleteTweetres= await fetch(deleteTweetUrl, {
+      method:"POST",
+      headers:{
+        Authorization:currentUser.token
+      },
+      body: JSON.stringify(deleteTweetObj)
+    });
+    setDeleting(false);
+    window.location.reload(false);
+  }
+
   return (
     <div>
       {userData && (
@@ -108,7 +122,8 @@ const Tweet = ({ tweet, setData }) => {
           </div>
           <p>Tweet User Id: {tweet.userId}</p>
           <p>Tweet Id: {tweet._id}</p>
-          <p>{tweet.description}</p>
+          <p>{tweet.description}</p>         
+          
           {
             liking ? <button>Liking....</button> : 
               <button onClick={handleLike}>
@@ -120,7 +135,14 @@ const Tweet = ({ tweet, setData }) => {
                 {tweet.likes.length}
              </button>            
           }
-
+          {
+            tweet.userId === currentUser._id && !deleting &&
+              <button className='ml-20 bg-slate-500 p-1 rounded-lg' onClick={()=>deleteTweet(currentUser._id,tweet._id)}>Delete</button>
+          }
+          {
+            deleting &&
+            <p>Deleting Please wait ....</p>
+          }
         </>
       )}
     </div>
