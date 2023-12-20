@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "SAM Template for Twitter Clone\n"
+Resources:
+  twitterCloneSignin:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/171ae1da40768144b3d0b895b39b9022
+      Handler: twitter-clone-signin.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Events:
+        twitterSignin:
+          Type: Api
+          Properties:
+            Path: /twitterSignin
+            Method: post
+            Auth:
+              Authorizers:
+                twitterLambdaAuthorizer:
+                  FunctionArn: arn:aws:lambda:us-east-1:201814457761:function:twitter-lambda-authorizer

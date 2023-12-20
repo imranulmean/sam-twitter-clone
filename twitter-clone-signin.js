@@ -231,7 +231,7 @@ const putDataExistingUser = async (_id,email, username, hashPassword) =>{
 }
 
 
-await handler(event1);
+// await handler(event1);
 
 
 

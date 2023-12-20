@@ -21,8 +21,8 @@ const Profile = () => {
   const [loading, setLoading]=useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {     
-      console.log("currentUser_id", currentUser)
+    const fetchData = async () => {
+      console.log(currentUser);      
       try {
         /// Get Current User Tweets ////////
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;

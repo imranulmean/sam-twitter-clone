@@ -21,9 +21,7 @@ export const handler = async (event) => {
   let result;
   
   const {userId, email, profilePic}= JSON.parse(event.body);
-    /////////////////// Getting Tweets by UserId ///////////
     result= await updateUser(userId, email, profilePic);
-    console.log("showing result/////////// Final",result);
     let response = {
       statusCode: 200,
       'headers': {
@@ -50,9 +48,8 @@ const updateUser = async (userId, email, profilePic) =>{
         },
         ReturnValues: 'ALL_NEW',
     });
-    const updateUserRes= await docClient.send(command);
-    console.log(updateUserRes);
-    // return updateUserRes;
+    const updateUserRes= await docClient.send(command);   
+    return updateUserRes;
 }
 
 await handler(event1);

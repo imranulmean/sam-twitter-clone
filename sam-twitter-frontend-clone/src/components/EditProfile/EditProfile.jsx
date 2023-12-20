@@ -19,11 +19,14 @@ const EditProfile = ({ setOpen }) => {
 
   const [img, setImg] = useState(null);
   const [imgUploadProgress, setImgUploadProgress] = useState(0);
-
+  const [liveImage, setLiveImage]=useState("");
+  const [fileUploading, setFileUploading]= useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const uploadImg = (file) => {
+
+    setFileUploading(true);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
@@ -52,17 +55,20 @@ const EditProfile = ({ setOpen }) => {
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          try {
-            const updateProfile = await axios.put(`/api/users/${currentUser._id}`, {
-              profilePicture: downloadURL,
+          try {           
+            const updateUserUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/updateUser";
+            const updateUserObj={userId:currentUser._id, email:currentUser.email, profilePic:downloadURL};
+            const updateUserRes= await fetch(updateUserUrl, {
+              method:"POST",
+              headers:{
+                Authorization: currentUser.token
+              },
+              body:JSON.stringify(updateUserObj)
             });
-
-            console.log(updateProfile);
+            setFileUploading(false);
           } catch (error) {
             console.log(error);
           }
-
-          console.log("downloaded " + downloadURL);
           dispatch(changeProfile(downloadURL));
         });
       }
@@ -75,8 +81,17 @@ const EditProfile = ({ setOpen }) => {
     navigate("/signin");
   };
 
-  useEffect(() => {
-    img && uploadImg(img);
+  useEffect(() => {    
+    const selectedFile=img;
+    console.log("selectedFile", selectedFile);
+    if(selectedFile){
+      const reader= new FileReader();
+      reader.onload = (e) =>{
+        setLiveImage(e.target.result);
+      }
+      // Read the image as a data URL
+      reader.readAsDataURL(selectedFile);      
+    }
   }, [img]);
 
   return (
@@ -90,6 +105,7 @@ const EditProfile = ({ setOpen }) => {
         </button>
         <h2 className="font-bold text-xl">Edit Profile</h2>
         <p>Choose a new profile picture</p>
+        <img src={liveImage} alt="Profile Picture" className="w-20 h-20"/>
         {imgUploadProgress > 0 ? (
           "Uploading " + imgUploadProgress + "%"
         ) : (
@@ -100,6 +116,15 @@ const EditProfile = ({ setOpen }) => {
             onChange={(e) => setImg(e.target.files[0])}
           />
         )}
+        {
+          !fileUploading ? 
+          <button
+          className="bg-blue-500 text-white py-2 rounded-full"
+          onClick={()=>uploadImg(img)}
+        >
+          Upload Image Now
+        </button> : <p> "Uploading " {imgUploadProgress}  + "%"</p>
+        }
 
         <p>Delete Account</p>
         <button
