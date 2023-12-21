@@ -1,8 +1,15 @@
 # create s3 bucket
 aws s3 mb s3://sam-twitter-nodejs
 
-#package cloudformation
+# package cloudformation
 aws cloudformation package --s3-bucket sam-twitter-nodejs --template-file template.yaml --output-template-file gen/template-generated.yaml
 
-#package deploy
+# package deploy
 aws cloudformation deploy --template-file gen/template-generated.yaml --stack-name sam-twitter-nodejs --capabilities CAPABILITY_IAM
+
+# Delete a Cloudformation Stack
+aws cloudformation delete-stack --stack-name sam-twitter-nodejs
+
+# Delete S3 bucket
+aws s3 rm s3://sam-twitter-nodejs --recursive
+aws s3 rb s3://sam-twitter-nodejs

@@ -12,7 +12,8 @@ const TimelineTweet = () => {
     const fetchData = async () => {
       try {
         /// Get Current User Tweets ////////
-        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
+        // const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
+        const getCurrentUserTweetUrl=`https://wkhhxvubsg.execute-api.us-east-1.amazonaws.com/Prod/twitterTweetsByUserIdApi/${currentUser._id}`;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
           method:"GET",
           headers:{

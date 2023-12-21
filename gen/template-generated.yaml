@@ -2,21 +2,192 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: "SAM Template for Twitter Clone\n"
 Resources:
+  twitterLambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      Handler: twitter-secure-api.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
   twitterCloneSignin:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-twitter-nodejs/171ae1da40768144b3d0b895b39b9022
+      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
       Handler: twitter-clone-signin.handler
       Runtime: nodejs20.x
       Architectures:
       - x86_64
+      Timeout: 10
       Events:
         twitterSignin:
           Type: Api
           Properties:
             Path: /twitterSignin
             Method: post
-            Auth:
-              Authorizers:
-                twitterLambdaAuthorizer:
-                  FunctionArn: arn:aws:lambda:us-east-1:201814457761:function:twitter-lambda-authorizer
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: '*'
+  twitterGetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      Handler: twitter-user-by-id.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterGetUserApi:
+          Type: Api
+          Properties:
+            Path: /getuser/{userid}
+            Method: get
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: '*'
+  twitterCreateTweet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      Handler: create-tweet.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterCreateTweetApi:
+          Type: Api
+          Properties:
+            Path: /createTweet
+            Method: post
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: '*'
+  twitterTweetsByUserId:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      Handler: tweets-by-userid.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterTweetsByUserIdApi:
+          Type: Api
+          Properties:
+            Path: /twitterTweetsByUserIdApi/{userid}
+            Method: get
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: '*'
+  twitterNewUsers:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: _id
+        AttributeType: S
+      - AttributeName: email
+        AttributeType: S
+      KeySchema:
+      - AttributeName: _id
+        KeyType: HASH
+      - AttributeName: email
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: twitterNewUsers
+  twitterExistingUsers:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: email
+        AttributeType: S
+      - AttributeName: _id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: email
+        KeyType: HASH
+      - AttributeName: _id
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: twitterExistingUsers
+  tweets:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: _id
+        AttributeType: S
+      - AttributeName: userId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: userId
+        KeyType: HASH
+      - AttributeName: _id
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: tweets
+  tweetByDates:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: year
+        AttributeType: S
+      - AttributeName: tweet_date
+        AttributeType: S
+      KeySchema:
+      - AttributeName: year
+        KeyType: HASH
+      - AttributeName: tweet_date
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: tweetByDates

@@ -21,7 +21,9 @@ const MainTweet = () => {
       description: tweetText,
     }
     try {
-      const createTweetUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets"
+      // const createTweetUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets"
+      const createTweetUrl="https://wkhhxvubsg.execute-api.us-east-1.amazonaws.com/Prod/createTweet"
+      
       const submitTweet= await fetch (createTweetUrl,{
         method:"POST",
         body: JSON.stringify(createTweetObj)

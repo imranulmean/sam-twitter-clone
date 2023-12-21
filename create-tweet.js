@@ -85,4 +85,4 @@ const putDataIn_tweetByDates = (tweetId, userId, createdAt, year) =>{
   } 
 }
 
-await handler(event1);
+// await handler(event1);

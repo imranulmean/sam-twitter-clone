@@ -54,4 +54,4 @@ const getTweetByUserId = async (userId) =>{
       }    
 }
 
-await handler(event1);
+// await handler(event1);

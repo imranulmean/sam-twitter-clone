@@ -26,7 +26,8 @@ export default function OAuth() {
 ///////////////////////
         try {
           // const res = await axios.post("/api/auth/signin", { username, password });
-          const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
+          // const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
+          const twitterSigninUrl="https://wkhhxvubsg.execute-api.us-east-1.amazonaws.com/Prod/twitterSignin";
           const signinObj={email,profilePicture,type};
 
           const res= await fetch(twitterSigninUrl,{
@@ -35,7 +36,8 @@ export default function OAuth() {
           })
           const loginData=await res.json();         
           //////////Getting User Follower Data
-          const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
+          // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
+          const findsUserUrl=`https://wkhhxvubsg.execute-api.us-east-1.amazonaws.com/Prod/getuser/${loginData._id}`;
           const findUser = await fetch(findsUserUrl,{
             method:"GET",
             headers:{

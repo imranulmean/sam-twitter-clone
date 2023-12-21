@@ -46,5 +46,5 @@ const genPolicy = (effect, resource) =>{
     return policy;    
 }
      
-await handler(event1);
+// await handler(event1);
 

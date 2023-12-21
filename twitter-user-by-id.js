@@ -58,4 +58,4 @@ const getTwitterUserById = async (userId) =>{
       }   
 }
 
-await handler(event1);
+// await handler(event1);

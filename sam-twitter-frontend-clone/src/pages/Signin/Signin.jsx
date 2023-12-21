@@ -23,7 +23,8 @@ const Signin = () => {
     setLoading(true);
     try {
       // const res = await axios.post("/api/auth/signin", { username, password });
-      const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
+      // const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
+      const twitterSigninUrl="https://t906g0vdxc.execute-api.us-east-1.amazonaws.com/Prod/twitterSignin";
       const signinObj={email,password};
       const res= await fetch(twitterSigninUrl,{
         method:"POST",
@@ -32,7 +33,9 @@ const Signin = () => {
       const loginData=await res.json();
       setLoading(false);
       //////////Getting User Follower Data
-      const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
+      // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
+      const findsUserUrl=`https://t906g0vdxc.execute-api.us-east-1.amazonaws.com/Prod/getuser/${loginData._id}`;
+      
       const findUser = await fetch(findsUserUrl,{
         method:"GET",
         headers:{
