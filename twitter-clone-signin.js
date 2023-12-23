@@ -109,16 +109,14 @@ export const handler = async (event) => {
   const timestamp = new Date().getTime();
   const _id= timestamp.toString();  
   let result;
-  let origin="http://localhost:5173"; 
   //////// Checking if the user Exists/////////////////////
 
     result= await checkUserExist(email);
-    console.log(result.Items);
    ////////////// If the User Exist check password ///////////////// 
     
    if(result.Count==1){ 
         
-        let tokenObj={origin};
+        let tokenObj={email};
         let tokenSecret="twitter-clone-token";
         
         if(type=== "google"){
@@ -128,7 +126,7 @@ export const handler = async (event) => {
             result = await checkPassword(password, result.Items[0]);
         }
         
-        result["token"]=jwt.sign(tokenObj,tokenSecret);
+        result["token"]=jwt.sign(tokenObj,tokenSecret);        
     }
     
     else{
@@ -144,7 +142,7 @@ export const handler = async (event) => {
             /////////// Now Login The Googgle User ////////
             result= await checkUserExist(email);
             result=result.Items[0];
-            let tokenObj={origin};
+            let tokenObj={email};
             let tokenSecret="twitter-clone-token";   
             result["token"]=jwt.sign(tokenObj,tokenSecret);                
         }
@@ -153,7 +151,6 @@ export const handler = async (event) => {
         }        
         
     }
-    console.log(result);
     let response = {
       statusCode: 200,
       'headers': {
@@ -231,7 +228,7 @@ const putDataExistingUser = async (_id,email, username, hashPassword) =>{
 }
 
 
-// await handler(event1);
+//  await handler(event1);
 
 
 

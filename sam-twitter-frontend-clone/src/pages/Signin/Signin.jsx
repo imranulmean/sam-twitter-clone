@@ -24,7 +24,8 @@ const Signin = () => {
     try {
       // const res = await axios.post("/api/auth/signin", { username, password });
       // const twitterSigninUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/twittersignin";
-      const twitterSigninUrl="https://t906g0vdxc.execute-api.us-east-1.amazonaws.com/Prod/twitterSignin";
+      const twitterSigninUrl=import.meta.env.twitterSigninUrl;
+      
       const signinObj={email,password};
       const res= await fetch(twitterSigninUrl,{
         method:"POST",

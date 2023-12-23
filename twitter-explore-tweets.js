@@ -23,13 +23,10 @@ export const handler = async (event) => {
   const year=formatedDate.getFullYear().toString();
   const month=formatedDate.getMonth() + 1;
   const day=formatedDate.getDay(); 
-  console.log(createdAt);
-  console.log(`${day}-${month}-${year}`);
-  
+ 
     ///////////////////Get All tweets of the recet Year ///////////
     result=await getTweets_RecentYear(year);
     result=await getTweets_tweetsTable(result);
-   console.log(result);
     let response = {
       statusCode: 200,
       'headers': {
@@ -52,7 +49,8 @@ const getTweets_RecentYear= async (year) => {
         },
         ExpressionAttributeValues:{
             ':year':year
-        }
+        },
+        ScanIndexForward: false
      });
         
     try {
@@ -80,12 +78,28 @@ const getTweets_tweetsTable = async (data) =>{
             
         try {
             let tweetRes= await docClient.send(command);
-            tweetArray.push(tweetRes.Items[0]);
+            // Get User Information from user table ///
+            command = new QueryCommand({
+                TableName: "twitterNewUsers",
+                KeyConditionExpression:"#userId= :userId",
+                ExpressionAttributeNames:{
+                    "#userId": "_id"
+                },
+                ExpressionAttributeValues:{
+                    ":userId":d.userId
+                }
+            });
+             let userData=await docClient.send(command);
+            let tweetObj=tweetRes.Items[0];
+            let userObj=userData.Items[0];
+            let obj={tweetObj,userObj}
+            tweetArray.push(obj);
            
         } catch (error) {          
                 console.log(error);
         } 
     }
+
    return tweetArray;
 }
-await handler(event1);
+// await handler(event1);

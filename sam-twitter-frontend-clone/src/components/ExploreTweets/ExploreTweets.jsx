@@ -13,6 +13,8 @@ const ExploreTweets = () => {
     const fetchData = async () => {
       try {
         const exploreTweetsUrl='https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/explore';
+        // const exploreTweetsUrl=import.meta.env.exploreTweetsUrl;
+        
         const exploreTweetsData= await fetch(exploreTweetsUrl,{
           method:"GET",
           headers:{
@@ -35,10 +37,10 @@ const ExploreTweets = () => {
         loading ? <button className="bg-slate-500">Loading Data ....</button> : 
         <div className="mt-6">
         {explore &&
-          explore.map((tweet) => {
+          explore.map((tweet,index) => {
             return (
-              <div key={tweet._id} className="p-2">
-                <Tweet tweet={tweet} setData={setExplore} />
+              <div key={index} className="p-2">
+                <Tweet tweet={tweet.tweetObj} userObj={tweet.userObj} setData={setExplore} />
               </div>
             );
           })}

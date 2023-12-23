@@ -40,9 +40,7 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
 
   export const handler = async (event) => {
     let connectionIds;
-    // console.log(event);
     const messages = event.Records;
-   // console.log(messages);
 
     if (!messages) {
       return;
@@ -54,15 +52,13 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
       while(messages.length>0){
         let m=messages.pop();       
         let messageBody=JSON.parse(m.body);
-        console.log("Showing Message Body");
-        console.log(messageBody);
-
         if(messageBody.type === "liked"){
+
             for (let c of connectionIds.Items){
               if(messageBody.userId === c.userId){
                 let requestParams = {
                   ConnectionId: c.connectionId,
-                  Data: `Someone Liked your this Tweet: ${messageBody.tweetId}`,
+                  Data: messageBody.tweetId,
                 };
                 let postCommand = new PostToConnectionCommand(requestParams);
                 try {
@@ -75,6 +71,7 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
           }
         }
         else if(messageBody.type === "followed"){
+
           for (let c of connectionIds.Items){
             if(messageBody.toFollowOrUnFollowId === c.userId){
               let requestParams = {
@@ -115,8 +112,6 @@ const getConnections = async () =>{
         ConsistentRead: true,
     });
     const getConnections= await docClient.send(command);
-    console.log("Showing Connections");
-    console.log(getConnections);
 
     return getConnections;
 }

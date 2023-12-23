@@ -16,7 +16,7 @@ const event1={
 ///////////////////////
 export const handler = async (event) => {
 
-  const {userId,description}= JSON.parse(event.body);
+  const {userId,description,tweetPic}= JSON.parse(event.body);
   const timestamp = new Date().getTime();
   const _id= timestamp.toString();
   let result;
@@ -31,7 +31,7 @@ export const handler = async (event) => {
   console.log(`${date}-${month}-${year}`);
 
     /////////////////// Creat Tweet with userId and description ///////////
-    result=await createTweet(_id, userId, description, createdAt, updatedAt);
+    result=await createTweet(_id, userId, description, tweetPic,createdAt, updatedAt);
     putDataIn_tweetByDates(_id, userId, createdAt, year);
     console.log(result);
     let response = {
@@ -47,13 +47,14 @@ export const handler = async (event) => {
   
 };
 
-const createTweet= async (_id, userId, description, createdAt, updatedAt) => {
+const createTweet= async (_id, userId, description, tweetPic, createdAt, updatedAt) => {
     let command= new PutCommand({
         TableName:"tweets",
         Item:{
           "_id":_id,
           "userId": userId,
           "description": description,
+          "tweetPic": tweetPic,
           "likes":[],          
           "createdAt": createdAt,
           "updatedAt": updatedAt

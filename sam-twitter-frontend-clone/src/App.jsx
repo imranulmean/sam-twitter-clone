@@ -7,6 +7,7 @@ import Explore from "./pages/Explore/Explore";
 import Signin from "./pages/Signin/Signin";
 import Navbar from "./components/Navbar/Navbar";
 import Error from "./pages/Error/Error";
+import TweetPage from "./pages/tweetPage";
 
 const Layout = () => {
   return (
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "/signout",
         element: <Signin />,
+      },
+      {
+        path: "/tweet/:userId/:tweetId",
+        element: <TweetPage />,
       }     
     ],
   },

@@ -24,7 +24,7 @@ const sqsClient = new SQSClient({});
 export const handler = async (event) => {
     // console.log(event);
     const eventData=JSON.parse(event.queryStringParameters.extraData);
-     console.log(eventData);
+
     let result;
   const command = new CreateTableCommand({
     TableName: "twitter-notification",

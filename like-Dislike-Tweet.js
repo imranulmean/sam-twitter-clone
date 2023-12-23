@@ -5,7 +5,8 @@ import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 const sqsClient = new SQSClient({});
-const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-notification-sqs";
+// const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-notification-sqs";
+const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-notification-sqs2";
 
 ////////////////////
 const userId="1702115625459";
@@ -119,5 +120,5 @@ const insertData_sqs = async(userId, tweetId) =>{
 }
 
 
-await handler(event1);
+// await handler(event1);
 

@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-const Tweet = ({ tweet, setData, }) => {
+const Tweet = ({ tweet, setData, userObj}) => {
   
   const { currentUser } = useSelector((state) => state.user);
   const [userData, setUserData] = useState();
@@ -21,21 +21,23 @@ const Tweet = ({ tweet, setData, }) => {
       try {
         
         /// Get User Data ///////
-        const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${tweet.userId}`;
-        const findUser = await fetch(findsUserUrl,{
-          method:"GET",
-          headers:{
-            Authorization:currentUser.token
-          }
-        });
-        const userData1=await findUser.json();
-        setUserData(userData1.Items[0]);
+        // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${tweet.userId}`;
+        // // const findsUserUrl=import.meta.env.findsUserUrl+tweet.userId;
+        // const findUser = await fetch(findsUserUrl,{
+        //   method:"GET",
+        //   headers:{
+        //     Authorization:currentUser.token
+        //   }
+        // });
+        // const userData1=await findUser.json();
+        // setUserData(userData1.Items[0]);
+        setUserData(userObj);
       } catch (err) {
         console.log("error", err);
       }
     };
 
-    fetchData();
+   fetchData();
   }, [tweet.userId, tweet.likes]);
 
   const handleLike = async (e) => {
@@ -43,8 +45,8 @@ const Tweet = ({ tweet, setData, }) => {
     setLiking(true);
     try {
       let likeObj={userId:tweet.userId, tweetId:tweet._id, userId2:currentUser._id};
-      console.log(likeObj);
       const likeUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/like";
+      // const likeUrl=import.meta.env.likeUrl;
       const likeData= await fetch(likeUrl,{
         method:"POST",
         headers:{
@@ -56,6 +58,7 @@ const Tweet = ({ tweet, setData, }) => {
 
       if (location.includes("profile")) {        
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
+        // const getCurrentUserTweetUrl=import.meta.env.getCurrentUserTweetUrl+id;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
           method:"GET",
           headers:{
@@ -67,7 +70,9 @@ const Tweet = ({ tweet, setData, }) => {
         setData(timelineTweetsData.Items);
       } else if (location.includes("explore")) {
 
-        const newData = await fetch(`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/explore`,{
+        const exploreTweetsUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/explore`;
+        // const exploreTweetsUrl=import.meta.env.exploreTweetsUrl;
+        const newData = await fetch(exploreTweetsUrl,{
           method:"GET",
           headers:{
             Authorization:currentUser.token
@@ -77,6 +82,7 @@ const Tweet = ({ tweet, setData, }) => {
       } else {
         /// get Current User Tweets
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
+        // const getCurrentUserTweetUrl=import.meta.env.getCurrentUserTweetUrl+id;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
           method:"GET",
           headers:{
@@ -118,8 +124,9 @@ const Tweet = ({ tweet, setData, }) => {
             </Link>
 
             <span className="font-normal">@{userData.username}</span>
-            <p> - {dateStr}</p>
+            <p> - {dateStr}</p>            
           </div>
+          {tweet.tweetPic !="" &&<img src={tweet.tweetPic} className="h-21 w-21"/>}
           <p>Tweet User Id: {tweet.userId}</p>
           <p>Tweet Id: {tweet._id}</p>
           <p>{tweet.description}</p>         

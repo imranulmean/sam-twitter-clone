@@ -12,7 +12,7 @@ const signupObj={userId,description}
 
 const event1={
     pathParameters:{
-        userid: "1702115625459"
+        userid: "1703268845825"
     },
     body:JSON.stringify(signupObj)
 }
@@ -38,6 +38,7 @@ export const handler = async (event) => {
 };
 
 const getTweetByUserId = async (userId) =>{
+  let tweetArray=[];
     let command= new QueryCommand({
         TableName:"tweets",
         KeyConditionExpression:
@@ -46,12 +47,30 @@ const getTweetByUserId = async (userId) =>{
           ":userId": userId,
         },
          ConsistentRead: true,
+         ScanIndexForward: false
       })
       try {
-        return await docClient.send(command);
+        let tweetRes= await docClient.send(command);
+        // Get User Information from user table ///
+        command = new QueryCommand({
+          TableName: "twitterNewUsers",
+          KeyConditionExpression:"#userId= :userId",
+          ExpressionAttributeNames:{
+              "#userId": "_id"
+          },
+          ExpressionAttributeValues:{
+              ":userId":userId
+          }
+      });
+        let userData=await docClient.send(command);
+        let tweetObj=tweetRes.Items;
+        let userObj=userData.Items[0];
+        let obj={tweetObj,userObj};
+        tweetArray.push(obj);
+        return tweetArray;                
       } catch (error) {
           console.log(error);
       }    
 }
 
-// await handler(event1);
+//  await handler(event1);

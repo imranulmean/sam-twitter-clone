@@ -8,12 +8,13 @@ const TimelineTweet = () => {
   const [timeLine, setTimeLine] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading]=useState(true);
+  const [userObj, setUserObj]= useState({});
   useEffect(() => {
     const fetchData = async () => {
       try {
         /// Get Current User Tweets ////////
-        // const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
-        const getCurrentUserTweetUrl=`https://wkhhxvubsg.execute-api.us-east-1.amazonaws.com/Prod/twitterTweetsByUserIdApi/${currentUser._id}`;
+        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
+        // const getCurrentUserTweetUrl=import.meta.env.getCurrentUserTweetUrl+currentUser._id;
         const timelineTweets= await fetch(getCurrentUserTweetUrl,{
           method:"GET",
           headers:{
@@ -23,7 +24,8 @@ const TimelineTweet = () => {
         
         const timelineTweetsData=await timelineTweets.json();
         setLoading(false);
-        setTimeLine(timelineTweetsData.Items);
+        setTimeLine(timelineTweetsData[0].tweetObj);
+        setUserObj(timelineTweetsData[0].userObj)
       } catch (err) {
         console.log("error", err);
       }
@@ -41,7 +43,7 @@ const TimelineTweet = () => {
             timeLine.map((tweet) => {
               return (
                 <div key={tweet._id} className="p-2">
-                  <Tweet tweet={tweet} setData={setTimeLine} />
+                  <Tweet tweet={tweet} userObj={userObj} setData={setTimeLine} />
                 </div>
               );
             })}

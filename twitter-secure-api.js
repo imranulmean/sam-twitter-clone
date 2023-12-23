@@ -1,33 +1,41 @@
 import jwt from "jsonwebtoken";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { PutCommand, QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
 const event1={
-    authorizationToken:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjUxNzMiLCJpYXQiOjE3MDIzNjM3OTd9.rqgZ2Nki82yhQLM5ZJkHLL54eP5XbMv0qz-QE_GCDEs",
+    authorizationToken:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impob25ueXNrMDA3QGdtYWlsLmNvbSIsImlhdCI6MTcwMzI4OTAzNn0.mtu5kIIdy2A7E4z1BgO_y4kot4ItavDMUzaJ2E6Gwu0",
     methodArn:"123456"
 }
 ///////////////////////
 
 export const handler = async (event) => {
-    const origin="http://localhost:5173";
     let tokenSecret="twitter-clone-token";
     let response, policy, principalId, context;
     const token=event.authorizationToken;
     const decodedToken=jwt.verify(token,tokenSecret);
-  if(decodedToken.origin === origin){
+    console.log(decodedToken);
+    let result;
+    result= await checkUserExist(decodedToken.email);
+    console.log(result);
+  // if(decodedToken.origin === origin)
+    if(result.Count==1){
       policy=genPolicy('allow', event.methodArn);
       principalId="*";
-    } else {
-      
-      return response="Unauthorized Acces";
-    }
-    
-       response={
+      response={
         principalId,
         policyDocument:policy,
         context
       }
-      return response;    
-  
+      return response;
+        
+    } 
+    else {
+      return "Unauthorized Acces";
+    }
 };
 
 const genPolicy = (effect, resource) =>{
@@ -45,6 +53,23 @@ const genPolicy = (effect, resource) =>{
     policy.Statement.push(stmt);
     return policy;    
 }
-     
+
+const checkUserExist= async(email) =>{
+  let command= new QueryCommand({
+      TableName:"twitterExistingUsers",
+      KeyConditionExpression:
+        "email= :email",
+      ExpressionAttributeValues: {
+        ":email": email,
+      },
+       ConsistentRead: true,
+    })
+    try {
+      return await docClient.send(command);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 // await handler(event1);
 

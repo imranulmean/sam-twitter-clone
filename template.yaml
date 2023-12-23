@@ -3,6 +3,13 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   SAM Template for Twitter Clone
 
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,POST,GET'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
+
 Resources:
   twitterLambdaAuthorizer:
     Type: AWS::Serverless::Function
@@ -118,7 +125,7 @@ Resources:
           Type: Api
           Properties:
             Path: /twitterTweetsByUserIdApi/{userid}
-            Method: get        
+            Method: get      
 
       Policies: 
         - Version: '2012-10-17'
@@ -132,7 +139,71 @@ Resources:
               - dynamodb:PutItem
               - dynamodb:UpdateItem
               - dynamodb:DeleteItem
-              Resource: '*'    
+              Resource: '*'
+
+  twitterExploreTweets:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: .
+      Handler: twitter-explore-tweets.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterExploreTweetsApi:
+          Type: Api
+          Properties:
+            Path: /exploreTweets
+            Method: get      
+
+      Policies: 
+        - Version: '2012-10-17'
+          Statement: 
+            - Effect: Allow
+              Action: 
+              - dynamodb:DescribeTable
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              Resource: '*'  
+
+  twitterLikeDislike:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: .
+      Handler: like-Dislike-Tweet.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterLikeDislikeApi:
+          Type: Api
+          Properties:
+            Path: /twitterLikeDislikeApi
+            Method: post           
+
+      Policies: 
+        - Version: '2012-10-17'
+          Statement: 
+            - Effect: Allow
+              Action: 
+              - dynamodb:DescribeTable
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - sqs:SendMessage
+              Resource: '*'                          
 
   twitterNewUsers:
     Type: AWS::DynamoDB::Table   
@@ -204,4 +275,13 @@ Resources:
       ProvisionedThroughput: 
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1 
-      TableName: "tweetByDates"          
+      TableName: "tweetByDates" 
+
+  twitterNotificationSqs:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: twitter-notification-sqs2
+      VisibilityTimeout: 30
+      SqsManagedSseEnabled: true
+
+                 

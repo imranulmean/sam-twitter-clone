@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
 import EditProfile from "../../components/EditProfile/EditProfile";
-
+import formatDistance from "date-fns/formatDistance";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
@@ -14,15 +14,16 @@ const Profile = () => {
   const [open, setOpen] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
   const [userTweets, setUserTweets] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
+  const [userProfile, setUserProfile] = useState({});
 
   const { id } = useParams();
   const dispatch = useDispatch();
   const [loading, setLoading]=useState(true);
+  const coverPhoto="https://firebasestorage.googleapis.com/v0/b/mern-estate-4e89d.appspot.com/o/new-day-quotes-zig-ziglar-yesterday-ende-9435.webp?alt=media&token=d9cda679-8c91-4054-bf3f-76250f10d6d9";
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(currentUser);      
+      console.log(currentUser);
       try {
         /// Get Current User Tweets ////////
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
@@ -34,19 +35,20 @@ const Profile = () => {
         });
         
         const timelineTweetsData=await timelineTweets.json();
-
-        /// Get User Data ///////
-        const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
-        const findUser = await fetch(findsUserUrl,{
-          method:"GET",
-          headers:{
-            Authorization:currentUser.token
-          }
-        });
-        const userData1=await findUser.json();
+        console.log(timelineTweetsData);
+        // /// Get User Data ///////
+        // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
+        // const findUser = await fetch(findsUserUrl,{
+        //   method:"GET",
+        //   headers:{
+        //     Authorization:currentUser.token
+        //   }
+        // });
+        // let user=await findUser.json();
         setLoading(false);
-        setUserTweets(timelineTweetsData.Items);
-        setUserProfile(userData1.Items[0]);
+        setUserTweets(timelineTweetsData[0].tweetObj);
+        setUserProfile(timelineTweetsData[0].userObj);
+       
       } catch (err) {
         console.log("error", err);
       }
@@ -55,10 +57,7 @@ const Profile = () => {
     fetchData();
   }, [currentUser, id]);
 
-  const handleFollow = async () => {
-    console.log("currentUser_id", currentUser)
-    console.log("toFollowOrUnFollowId", id)
-    
+  const handleFollow = async () => {    
     try {
       let followObj={
         toFollowOrUnFollowId: id,
@@ -90,12 +89,16 @@ const Profile = () => {
           <LeftSidebar />
         </div>
         <div className="col-span-2 border-x-2 border-t-slate-800 px-6">
+          <img src={coverPhoto} className="h-64 w-full rounded-lg"/>
           <div className="flex justify-between items-center">
-            <img
-              src={userProfile?.profilePicture}
-              alt="Profile Picture"
-              className="w-12 h-12 rounded-full"
-            />
+            <div className="flex items-center">
+              <img src={userProfile?.profilePicture} alt="Profile Picture" className="w-12 h-12 rounded-full" />
+              <div className="ml-4">
+                <p>{userProfile.username}</p>
+                <p>Joined: {formatDistance(new Date(userProfile.Date), new Date()).toString()}</p>
+                <p>Following:{userProfile.following.length}  Follower:{userProfile.followers.length}</p>
+              </div>
+            </div>
             {currentUser._id === id ? (
               <button
                 className="px-4 -y-2 bg-blue-500 rounded-full text-white"
@@ -124,7 +127,7 @@ const Profile = () => {
               userTweets.map((tweet) => {
                 return (
                   <div className="p-2" key={tweet._id}>
-                    <Tweet tweet={tweet} setData={setUserTweets} />
+                    <Tweet tweet={tweet} userObj={userProfile} setData={setUserTweets} />
                   </div>
                 );
               })}

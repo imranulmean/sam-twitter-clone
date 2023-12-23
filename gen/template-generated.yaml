@@ -1,11 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: "SAM Template for Twitter Clone\n"
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,POST,GET'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
 Resources:
   twitterLambdaAuthorizer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
       Handler: twitter-secure-api.handler
       Runtime: nodejs20.x
       Architectures:
@@ -14,7 +20,7 @@ Resources:
   twitterCloneSignin:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
       Handler: twitter-clone-signin.handler
       Runtime: nodejs20.x
       Architectures:
@@ -42,7 +48,7 @@ Resources:
   twitterGetUser:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
       Handler: twitter-user-by-id.handler
       Runtime: nodejs20.x
       Architectures:
@@ -70,7 +76,7 @@ Resources:
   twitterCreateTweet:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
       Handler: create-tweet.handler
       Runtime: nodejs20.x
       Architectures:
@@ -98,7 +104,7 @@ Resources:
   twitterTweetsByUserId:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-twitter-nodejs/c46f8f4dddc937e30baae7eff615d32a
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
       Handler: tweets-by-userid.handler
       Runtime: nodejs20.x
       Architectures:
@@ -122,6 +128,66 @@ Resources:
           - dynamodb:PutItem
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
+          Resource: '*'
+  twitterExploreTweets:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
+      Handler: twitter-explore-tweets.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterExploreTweetsApi:
+          Type: Api
+          Properties:
+            Path: /exploreTweets
+            Method: get
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: '*'
+  twitterLikeDislike:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-twitter-nodejs/99bd928cd95177494c1112ba550dad16
+      Handler: like-Dislike-Tweet.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Timeout: 10
+      Events:
+        twitterLikeDislikeApi:
+          Type: Api
+          Properties:
+            Path: /twitterLikeDislikeApi
+            Method: post
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - sqs:SendMessage
           Resource: '*'
   twitterNewUsers:
     Type: AWS::DynamoDB::Table
@@ -191,3 +257,9 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       TableName: tweetByDates
+  twitterNotificationSqs:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: twitter-notification-sqs2
+      VisibilityTimeout: 30
+      SqsManagedSseEnabled: true
