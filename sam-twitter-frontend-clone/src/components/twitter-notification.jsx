@@ -25,11 +25,7 @@ const TwitterNotification = () => {
 
     ws.onclose = () => {
       console.log('WebSocket connection closed');
-      setReceivedMessages((prev)=>[...prev, 'WebSocket connection closed']);
-      ws.onopen = () => {
-        console.log('WebSocket connection opened');
-        setReceivedMessages((prev)=>[...prev,'WebSocket connection opened'])
-      };      
+      setReceivedMessages((prev)=>[...prev, 'WebSocket connection closed']);    
     };
 
     // Save the WebSocket instance in the state
@@ -39,9 +35,8 @@ const TwitterNotification = () => {
     return () => {
       ws.close();
     };
-  }, []); // The empty dependency array ensures that this effect runs only once
+  }, []);
 
- 
 
   return (
     <>
@@ -51,7 +46,8 @@ const TwitterNotification = () => {
       <ul>
         {receivedMessages.map((msg, index) => (
           <li key={index}>
-            <Link to={`/tweet/${currentUser._id}/${msg}`}>Someone Liked your tweet {msg}</Link>
+            <Link to={`/tweetPage/${currentUser._id}/${msg}`}>Someone Liked your tweet {msg}</Link>
+            
           </li>
         ))}
       </ul>    

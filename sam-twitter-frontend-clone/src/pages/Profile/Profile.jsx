@@ -35,7 +35,6 @@ const Profile = () => {
         });
         
         const timelineTweetsData=await timelineTweets.json();
-        console.log(timelineTweetsData);
         // /// Get User Data ///////
         // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
         // const findUser = await fetch(findsUserUrl,{
@@ -84,11 +83,8 @@ const Profile = () => {
     <>
     { 
     loading ? <button className="bg-yellow-800">Loading Data ....</button> : 
-        <div className="grid grid-cols-1 md:grid-cols-4">
-        <div className="px-6">
-          <LeftSidebar />
-        </div>
-        <div className="col-span-2 border-x-2 border-t-slate-800 px-6">
+        <div>
+        <div>
           <img src={coverPhoto} className="h-64 w-full rounded-lg"/>
           <div className="flex justify-between items-center">
             <div className="flex items-center">
@@ -132,10 +128,6 @@ const Profile = () => {
                 );
               })}
           </div>
-        </div>
-
-        <div className="px-6">
-          <RightSidebar />
         </div>
       </div>    
     }

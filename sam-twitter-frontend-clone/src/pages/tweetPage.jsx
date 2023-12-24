@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import LeftSidebar from "../components/LeftSidebar/LeftSidebar";
 import RightSidebar from "../components/RightSidebar/RightSidebar";
 import { useSelector } from "react-redux";
@@ -7,23 +7,42 @@ import { Link, useLocation, useParams } from "react-router-dom";
 const TweetPage = () =>{
     const { currentUser } = useSelector((state) => state.user);
     const { userId, tweetId }=useParams();
+    const [tweetResult, setTweetResult]= useState({});
+    useEffect(()=>{
+       const getTweet= async () =>{
+        try {
+          const getTweetUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/getTweet";
+          const getTweetObj={userId, tweetId};
+          const getTweetRes= await fetch(getTweetUrl,{
+            method:"POST",
+            headers:{
+              Authorization:currentUser.token
+            },
+            body: JSON.stringify(getTweetObj)
+          });
+          let result=await getTweetRes.json();         
+          setTweetResult(result.Item);
+          console.log(tweetResult);     
+        } catch (error) {
+          console.log(error);
+        }
+       }
+       getTweet();
+    },[])
 
     return (
         <>
           {!currentUser ? (
             <Signin />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-4">
-              <div className="px-6">
-                <LeftSidebar />
+          ) : (            
+              tweetResult?._id ? 
+              <div>
+                <img src={tweetResult.tweetPic.S} />
+                <p>Description:{tweetResult.description.S}</p>
+                <p>Created:{tweetResult.createdAt.S}</p>
+                <p>Likes: {tweetResult.likes.L.length}</p>
               </div>
-              <div className="col-span-2 border-x-2 border-t-slate-800 px-6">
-                Showing the tweet
-              </div>
-              <div className="px-6">
-                <RightSidebar />
-              </div>
-            </div>
+                : <p>loading</p>
           )}
         </>
       );

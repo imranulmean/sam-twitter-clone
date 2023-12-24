@@ -5,8 +5,9 @@ import { useLocation, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 const UserPlaceholder = ({ setUserData, userData }) => {
-  const { id } = useParams();
+  // const { id } = useParams();
   const location = useLocation().pathname;
+  const id=location.substring(location.lastIndexOf('/')+1);
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -21,7 +22,6 @@ const UserPlaceholder = ({ setUserData, userData }) => {
           }
         });
         const userProfile =await findUser.json();
-        console.log(userProfile);
         setUserData(userProfile.Items[0]);
       } catch (e) {
         console.log(e);

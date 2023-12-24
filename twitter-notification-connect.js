@@ -24,49 +24,11 @@ const sqsClient = new SQSClient({});
 export const handler = async (event) => {
     // console.log(event);
     const eventData=JSON.parse(event.queryStringParameters.extraData);
-
     let result;
-  const command = new CreateTableCommand({
-    TableName: "twitter-notification",
-    AttributeDefinitions: [
-      {
-        AttributeName: "connectionDate",
-        AttributeType: "S",
-      },
-      {
-        AttributeName: "connectionId",
-        AttributeType: "S",
-      },      
-    ],
-    KeySchema: [
-      {
-        AttributeName: "connectionDate",
-        KeyType: "HASH",
-      },
-      {
-        AttributeName: "connectionId",
-        KeyType: "RANGE",
-      }      
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 1,
-      WriteCapacityUnits: 1,
-    },
-  });
-
-  try {
-
-    //// Creating table and putting data////////
-    const response = await client.send(command);
-    console.log(response);
-   // result=await putData_twitterNotification(event.requestContext.connectionId);
-
-  } catch (error) {
-
     ///////// Table Already Exists now putting data ///////
     result=await putData_twitterNotification(event.requestContext.connectionId,eventData._id);    
     console.log(result);
-  }
+  
     return {
         statusCode:200
     };

@@ -3,10 +3,48 @@ const client = new DynamoDBClient({});
 
 export const handler= async ()=>{
     
-    await twitterNewUsers();
-    await twitterExistingUsers();
-    await tweets();
-    await tweetByDates();
+    // await twitterNewUsers();
+    // await twitterExistingUsers();
+    // await tweets();
+    // await tweetByDates();
+    await twitterNotification();
+}
+
+const twitterNotification = async () =>{
+  const command = new CreateTableCommand({
+    TableName: "twitter-notification",
+    AttributeDefinitions: [
+      {
+        AttributeName: "connectionDate",
+        AttributeType: "S",
+      },
+      {
+        AttributeName: "connectionId",
+        AttributeType: "S",
+      },      
+    ],
+    KeySchema: [
+      {
+        AttributeName: "connectionDate",
+        KeyType: "HASH",
+      },
+      {
+        AttributeName: "connectionId",
+        KeyType: "RANGE",
+      }      
+    ],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 1,
+      WriteCapacityUnits: 1,
+    },
+  });
+
+  try {
+      let response= await client.send(command);
+      console.log(response);
+  } catch (error) {
+    
+  }
 }
 
 const twitterNewUsers = async () =>{
