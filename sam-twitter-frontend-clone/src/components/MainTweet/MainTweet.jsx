@@ -3,6 +3,8 @@ import TimelineTweet from "../TimelineTweet/TimelineTweet";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import ImagePasteTextArea from "../ImagePasteTextArea";
+import Tweet from "../Tweet/Tweet";
+
 import {
   getStorage,
   ref,
@@ -17,11 +19,12 @@ const MainTweet = () => {
   const [tweetText, setTweetText] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading]= useState(false);
-
   const [img, setImg] = useState('');
   const [imgUploadProgress, setImgUploadProgress] = useState(0);
   const [liveImage, setLiveImage]=useState("");
   const [fileUploading, setFileUploading]= useState(false);
+  const [newTweet, setNewTweet]= useState({});
+  const [showNewTweet, setShowNewTweet]= useState(false);
 
   useEffect(()=>{
     const selectedFile=img;
@@ -57,8 +60,12 @@ const MainTweet = () => {
           method:"POST",
           body: JSON.stringify(createTweetObj)
         });
+        const createTweetRes= await submitTweet.json();
+        console.log(createTweetRes);
+        setNewTweet(createTweetRes);
         setLoading(false);
-        window.location.reload(false);
+        setShowNewTweet(true);
+        //window.location.reload(false);
       } catch (err) {
         console.log(err);
       }
@@ -96,7 +103,7 @@ const MainTweet = () => {
               body: JSON.stringify(createTweetObj)
             });
             setLoading(false);
-            window.location.reload(false);
+            //window.location.reload(false);
           } catch (err) {
             console.log(err);
           }
@@ -108,7 +115,11 @@ const MainTweet = () => {
   return (
     <div className="top-20">
       {currentUser && (
-        <p className="font-bold pl-2 my-2">{currentUser.username}</p>
+        <div>
+          <img src={currentUser.profilePicture} className="h-auto w-8 rounded-full "/>
+          <p className="font-bold pl-2 my-2">{currentUser.username}</p>
+        </div>
+        
       )}
       
       <form className="border-b-2 pb-6">
@@ -137,6 +148,10 @@ const MainTweet = () => {
         }
 
       </form>
+      {
+        showNewTweet && <Tweet tweet={newTweet} userObj={currentUser} setData={""} userTweets={""}/>
+      }
+      
       <TimelineTweet />
     </div>
   );

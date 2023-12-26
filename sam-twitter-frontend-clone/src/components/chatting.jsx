@@ -28,6 +28,7 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
       }, [lastMessage]);    
 
     const handleClickSendMessage =(connectionId) => {
+        
         let message={chatmessage,connectionId};
          sendMessage(JSON.stringify({"action":"sendMessage", "message":message}));
          setChatMessage("");
@@ -61,8 +62,10 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
                             <div className="flex flex-col justify-between">
                                 {/* <textarea className="bg-white rounded-lg w-full mb-5"  maxLength={280} readOnly value={c.chat}></textarea> */}
                                 <p>Message: {c.chat}</p>
-                                <input type="text" onChange={(e)=>setChatMessage(e.target.value)} value={chatmessage} placeholder={placeholder}/>
-                                <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-blue-500 rounded-lg uppercase my-2'> Send Message</button>
+                                <form onSubmit={(e) => e.preventDefault()}>
+                                    <input type="text" onChange={(e)=>setChatMessage(e.target.value)} value={chatmessage} placeholder={placeholder}/>
+                                    <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-blue-500 rounded-lg uppercase my-2'> Send Message</button>
+                                </form>
                             </div>
                            }
                         </div>

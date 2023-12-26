@@ -6,10 +6,12 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
 
-const userId="1702116038174"; /// You are going to follow this id
-const email="test002@gmail.com"; /// userId2 is the Follower
-const profilePic="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
-const updateUserObj={userId,email,profilePic}
+const userId="1703289792581"; /// You are going to follow this id
+const email="jhonnysk007@gmail.com"; 
+// const profilePic="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+const profilePic="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ489dlrjRhzoW4whK964CeiA_TZF4RH6vKpeXfrDYTgFyOtKAAxp2KGjmYfYKMHvLFG3Q&usqp=CAU"
+const type="coverPhoto"
+const updateUserObj={userId,email,profilePic,type}
 
 
 const event1={
@@ -20,8 +22,9 @@ const event1={
 export const handler = async (event) => {
   let result;
   
-  const {userId, email, profilePic}= JSON.parse(event.body);
-    result= await updateUser(userId, email, profilePic);
+  const {userId, email, profilePic,type}= JSON.parse(event.body);
+
+    result= await updateUser(userId, email, profilePic, type);
     let response = {
       statusCode: 200,
       'headers': {
@@ -35,14 +38,23 @@ export const handler = async (event) => {
   
 };
 
-const updateUser = async (userId, email, profilePic) =>{
+const updateUser = async (userId, email, profilePic, type) =>{
+  let updateExpression;
+  console.log(type);
+  
+  if(type=== "profilePic"){
+    updateExpression="set profilePicture=:profilePic";
+  }
+  if(type=== "coverPhoto"){
+    updateExpression="set coverPhoto=:profilePic";
+  }
     let command= new UpdateCommand({
         TableName:'twitterNewUsers',
         Key:{
             "_id":userId,
             "email":email
         },
-        UpdateExpression:"set profilePicture=:profilePic",
+        UpdateExpression:updateExpression,
         ExpressionAttributeValues:{
             ":profilePic":profilePic
         },

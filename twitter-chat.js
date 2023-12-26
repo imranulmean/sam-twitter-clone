@@ -16,9 +16,9 @@ const callbackUrl = `https://${domain}/${stage}`;
 const client = new ApiGatewayManagementApiClient({ endpoint: callbackUrl });
 
 export const handler = async (event) => {
-     console.log(event);
+
      let messageBody=JSON.parse(event.body);
-     let obj={message:messageBody.message.chatmessage, type:"chat"}   
+     let obj={message:messageBody.message.chatmessage, type:"chat", sender:event.requestContext.connectionId, receiver:messageBody.message.connectionId}   
     let requestParams = {
         ConnectionId: messageBody.message.connectionId,
         Data: JSON.stringify(obj),

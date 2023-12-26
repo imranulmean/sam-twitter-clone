@@ -5,7 +5,7 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
-const userId="1702116038174";
+const userId="1703289792581";
 const description="This is my 11th tweet from Test 002 tweet how are you today";
 
 const signupObj={userId,description}
@@ -27,9 +27,6 @@ export const handler = async (event) => {
   const month=formatedDate.getMonth() + 1;
   const date=formatedDate.getDate().toString();
   
-  console.log(createdAt);
-  console.log(`${date}-${month}-${year}`);
-
     /////////////////// Creat Tweet with userId and description ///////////
     result=await createTweet(_id, userId, description, tweetPic,createdAt, updatedAt);
     putDataIn_tweetByDates(_id, userId, createdAt, year);
@@ -62,7 +59,8 @@ const createTweet= async (_id, userId, description, tweetPic, createdAt, updated
       });
       try {
         let createTweetRes= await docClient.send(command);
-        return createTweetRes;
+        let obj={_id, userId, description, tweetPic, createdAt}
+        return obj;
       } catch (error) {
           console.log(error);
       } 

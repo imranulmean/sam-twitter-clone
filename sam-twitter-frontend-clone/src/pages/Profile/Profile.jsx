@@ -34,6 +34,7 @@ const Profile = () => {
         });
         
         const timelineTweetsData=await timelineTweets.json();
+        
         setLoading(false);
         setUserTweets(timelineTweetsData[0].tweetObj);
         setUserProfile(timelineTweetsData[0].userObj);
@@ -59,9 +60,7 @@ const Profile = () => {
           Authorization:currentUser.token
         },
         body: JSON.stringify(followObj)
-      });
-      console.log(await followUnfollowData.json());
-      
+      });      
       dispatch(following(id));
     } catch (err) {
       console.log("error", err);
@@ -75,10 +74,13 @@ const Profile = () => {
     loading ? <button className="bg-yellow-800">Loading Data ....</button> : 
         <div>
         <div>
-          <img src={coverPhoto} className="h-64 w-full rounded-lg"/>
+          {
+            userProfile.coverPhoto ? <img src={userProfile.coverPhoto} className="h-64 w-full rounded-lg"/>
+            : <img src={coverPhoto} className="h-64 w-full rounded-lg"/>
+          }          
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <img src={userProfile?.profilePicture} alt="Profile Picture" className="w-12 h-12 rounded-full" />
+              <img src={userProfile?.profilePicture} alt="Profile Picture" className="w-28 h-auto rounded-full" />
               <div className="ml-4">
                 <p>{userProfile.username}</p>
                 <p>Joined: {formatDistance(new Date(userProfile.Date), new Date()).toString()}</p>

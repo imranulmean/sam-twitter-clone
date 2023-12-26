@@ -16,22 +16,10 @@ const Tweet = ({ tweet, setData, userObj, userTweets}) => {
   const location = useLocation().pathname;
   const { id } = useParams();
   const [deleting, setDeleting]= useState(false);
-  useEffect(() => {
-    
+
+  useEffect(() => {  
     const fetchData = async () => {
       try {
-        
-        /// Get User Data ///////
-        // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${tweet.userId}`;
-        // // const findsUserUrl=import.meta.env.findsUserUrl+tweet.userId;
-        // const findUser = await fetch(findsUserUrl,{
-        //   method:"GET",
-        //   headers:{
-        //     Authorization:currentUser.token
-        //   }
-        // });
-        // const userData1=await findUser.json();
-        // setUserData(userData1.Items[0]);
         setUserData(userObj);
       } catch (err) {
         console.log("error", err);
@@ -84,7 +72,7 @@ const Tweet = ({ tweet, setData, userObj, userTweets}) => {
       {userData && (
         <>
           <div className="flex space-x-2">
-            {/* <img src="" alt="" /> */}
+            <img src={userData.profilePicture} className="h-auto w-10 rounded-full"/>
             <Link to={`/profile/${userData._id}`}>
               <h3 className="font-bold">{userData.username}</h3>
             </Link>
@@ -100,12 +88,12 @@ const Tweet = ({ tweet, setData, userObj, userTweets}) => {
           {
             liking ? <button>Liking....</button> : 
               <button onClick={handleLike}>
-                {tweet.likes.includes(currentUser._id) ? (
+                {tweet.likes?.includes(currentUser._id) ? (
                   <FavoriteIcon className="mr-2 my-2 cursor-pointer"></FavoriteIcon>
                 ) : (
                   <FavoriteBorderIcon className="mr-2 my-2 cursor-pointer"></FavoriteBorderIcon>
                 )}
-                {tweet.likes.length}
+                {tweet.likes?.length}
              </button>            
           }
           {
