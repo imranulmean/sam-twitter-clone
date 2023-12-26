@@ -22,7 +22,6 @@ const TweetPage = () =>{
           });
           let result=await getTweetRes.json();         
           setTweetResult(result.Item);
-          console.log(tweetResult);     
         } catch (error) {
           console.log(error);
         }

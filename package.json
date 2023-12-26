@@ -22,6 +22,8 @@
     "deleteTweet": "nodemon twitter-delete-tweet.js",
     "createDb": "nodemon createDatabase.js",
     "getTweet": "nodemon twitter-getTweet.js",
+    "chatConnections": "nodemon twitter-chatConnections.js",
+    "chat": "nodemon twitter-chat.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

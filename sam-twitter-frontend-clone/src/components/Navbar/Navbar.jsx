@@ -10,7 +10,7 @@ const Navbar = () => {
   const location = useLocation().pathname;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 my-5 justify-center">
+    <div className=" top-0 bg-white grid grid-cols-1 md:grid-cols-4  justify-center">
       <div className="mx-auto md:mx-0">
         <img
           src="/twitter-logo.png"

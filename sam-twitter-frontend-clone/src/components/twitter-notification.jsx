@@ -1,47 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import useWebSocket from 'react-use-websocket';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
+import Chatting from './chatting';
 
-const TwitterNotification = () => {
-  const [webSocket, setWebSocket] = useState(null);
-  const [message, setMessage] = useState('');
+const TwitterNotification = ({connections, setfetchAgain}) => {
+  
   const [receivedMessages, setReceivedMessages] = useState([]); 
   const { currentUser } = useSelector((state) => state.user);
+  const [open, setOpen] = useState(false);
+  const socketUrl = `wss://51czt4rjh0.execute-api.us-east-1.amazonaws.com/production?extraData=${encodeURIComponent(JSON.stringify(currentUser))}`;
+  const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket,} = 
+  useWebSocket(socketUrl, {
+    onOpen: () =>{
+      console.log('opened');
+    } , 
+    onError: (event) => {
+      console.error('WebSocket error:', event);
+      // const errorMessage = event.message || 'Unknown WebSocket error';
+      // console.log('Error Message:', errorMessage);
+  },       
+    shouldReconnect: (closeEvent) => true,
+  });
   
   useEffect(() => {
-    // Create a WebSocket connection when the component mounts
-    const url = `wss://51czt4rjh0.execute-api.us-east-1.amazonaws.com/production?extraData=${encodeURIComponent(JSON.stringify(currentUser))}`;
-    const ws = new WebSocket(url);
+    
+    if(lastMessage){
 
-    ws.onopen = () => {
-      console.log('WebSocket connection opened');
-      setReceivedMessages((prev)=>[...prev,'WebSocket connection opened'])
-    };
-
-    ws.onmessage = (event) => {
-      const receivedMessage = event.data;
-      setReceivedMessages((prev)=> [...prev,receivedMessage]);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-      setReceivedMessages((prev)=>[...prev, 'WebSocket connection closed']);    
-    };
-
-    // Save the WebSocket instance in the state
-    setWebSocket(ws);
-
-    // Clean up the WebSocket connection when the component unmounts
-    return () => {
-      ws.close();
-    };
-  }, []);
-
-
-  return (
+      let parsedMessage=JSON.parse(lastMessage.data);
+        if(!parsedMessage.type){
+          let messsageArray=[];
+          messsageArray.push(lastMessage.data);
+          setReceivedMessages((prev)=>[...prev,messsageArray[0]]);          
+        }
+    }  
+  }, [lastMessage]);
+return (
     <>
     <h2>Notification Page</h2>
-    
+    <button onClick={()=>setOpen(true)} className='bg-red-800 p-1 rounded-lg uppercase m-1' > Open Messagebox </button>
     <button className='bg-green-800 p-1 rounded-lg uppercase m-1' onClick={()=>setReceivedMessages([])} >Clear Notification</button>
       <ul>
         {receivedMessages.map((msg, index) => (
@@ -51,6 +48,8 @@ const TwitterNotification = () => {
           </li>
         ))}
       </ul>    
+      { open && <Chatting setOpen={setOpen} connections={connections} setfetchAgain={setfetchAgain} sendMessage={sendMessage} 
+                lastMessage={lastMessage} receivedMessages={receivedMessages} setReceivedMessages={setReceivedMessages}/>}
     </>
 
   );

@@ -23,7 +23,6 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(currentUser);
       try {
         /// Get Current User Tweets ////////
         const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
@@ -35,15 +34,6 @@ const Profile = () => {
         });
         
         const timelineTweetsData=await timelineTweets.json();
-        // /// Get User Data ///////
-        // const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${id}`;
-        // const findUser = await fetch(findsUserUrl,{
-        //   method:"GET",
-        //   headers:{
-        //     Authorization:currentUser.token
-        //   }
-        // });
-        // let user=await findUser.json();
         setLoading(false);
         setUserTweets(timelineTweetsData[0].tweetObj);
         setUserProfile(timelineTweetsData[0].userObj);
@@ -54,7 +44,7 @@ const Profile = () => {
     };
 
     fetchData();
-  }, [currentUser, id]);
+  }, []);
 
   const handleFollow = async () => {    
     try {
@@ -123,7 +113,7 @@ const Profile = () => {
               userTweets.map((tweet) => {
                 return (
                   <div className="p-2" key={tweet._id}>
-                    <Tweet tweet={tweet} userObj={userProfile} setData={setUserTweets} />
+                    <Tweet tweet={tweet} userObj={userProfile} setData={setUserTweets} userTweets={userTweets}/>
                   </div>
                 );
               })}

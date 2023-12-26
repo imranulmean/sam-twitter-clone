@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-const Tweet = ({ tweet, setData, userObj}) => {
+const Tweet = ({ tweet, setData, userObj, userTweets}) => {
   
   const { currentUser } = useSelector((state) => state.user);
   const [userData, setUserData] = useState();
@@ -17,6 +17,7 @@ const Tweet = ({ tweet, setData, userObj}) => {
   const { id } = useParams();
   const [deleting, setDeleting]= useState(false);
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
         
@@ -38,7 +39,7 @@ const Tweet = ({ tweet, setData, userObj}) => {
     };
 
    fetchData();
-  }, [tweet.userId, tweet.likes]);
+  }, [tweet.likes]);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -54,45 +55,10 @@ const Tweet = ({ tweet, setData, userObj}) => {
         },        
         body: JSON.stringify(likeObj)
       })
+     
+      let likeDataRes=await likeData.json();
+      tweet.likes=likeDataRes.Attributes.likes;
       setLiking(false);
-
-      if (location.includes("profile")) {        
-        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${id}`;
-        // const getCurrentUserTweetUrl=import.meta.env.getCurrentUserTweetUrl+id;
-        const timelineTweets= await fetch(getCurrentUserTweetUrl,{
-          method:"GET",
-          headers:{
-            Authorization:currentUser.token
-          }
-        });
-        
-        const timelineTweetsData=await timelineTweets.json();
-        setData(timelineTweetsData.Items);
-      } else if (location.includes("explore")) {
-
-        const exploreTweetsUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/explore`;
-        // const exploreTweetsUrl=import.meta.env.exploreTweetsUrl;
-        const newData = await fetch(exploreTweetsUrl,{
-          method:"GET",
-          headers:{
-            Authorization:currentUser.token
-          }
-        });
-        setData(await newData.json());
-      } else {
-        /// get Current User Tweets
-        const getCurrentUserTweetUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/timeline/${currentUser._id}`;
-        // const getCurrentUserTweetUrl=import.meta.env.getCurrentUserTweetUrl+id;
-        const timelineTweets= await fetch(getCurrentUserTweetUrl,{
-          method:"GET",
-          headers:{
-            Authorization:currentUser.token
-          }
-        });
-        
-        const timelineTweetsData=await timelineTweets.json();
-        setData(timelineTweetsData.Items);
-      }
     } catch (err) {
       console.log("error", err);
     }
@@ -126,7 +92,7 @@ const Tweet = ({ tweet, setData, userObj}) => {
             <span className="font-normal">@{userData.username}</span>
             <p> - {dateStr}</p>            
           </div>
-          {tweet.tweetPic !="" &&<img src={tweet.tweetPic} className="h-21 w-21"/>}
+          {tweet.tweetPic !="" &&<img src={tweet.tweetPic} className="h-auto max-w-md mx-auto rounded-lg"/>}
           <p>Tweet User Id: {tweet.userId}</p>
           <p>Tweet Id: {tweet._id}</p>
           <p>{tweet.description}</p>         
