@@ -8,10 +8,11 @@ import { responsiveProperty } from "@mui/material/styles/cssUtils";
 const RightSidebar = () => {
   const {currentUser}= useSelector((state)=>state.user);
   const [connections, setConnections]=  useState([]);
-  const [loading, setLoading]= useState(true);
+  const [loading, setLoading]= useState(false);
   const [fetchAgain, setfetchAgain]= useState(false);
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const getConncetionsURl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getChatConnections";
         const getConncetionsRes= await fetch(getConncetionsURl,{
@@ -21,9 +22,9 @@ const RightSidebar = () => {
           }
         });
          let res=await getConncetionsRes.json();
-         console.log(res);
          setConnections(res);
          setfetchAgain(false);
+         setLoading(false);
        
       } catch (err) {
         console.log("error", err);
@@ -42,7 +43,7 @@ const RightSidebar = () => {
         <p className="font-bold">#ravenclaw</p>      
       </div> */}
       <div className="bg-yellow-100  w-full">
-       <TwitterNotification connections={connections} setfetchAgain={setfetchAgain} ></TwitterNotification>
+       <TwitterNotification connections={connections} setfetchAgain={setfetchAgain} loading={loading}></TwitterNotification>
       </div>
       
     </>

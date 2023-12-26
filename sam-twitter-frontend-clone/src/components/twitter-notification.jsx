@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Chatting from './chatting';
 
-const TwitterNotification = ({connections, setfetchAgain}) => {
+const TwitterNotification = ({connections, setfetchAgain , loading}) => {
   
   const [receivedMessages, setReceivedMessages] = useState([]); 
   const { currentUser } = useSelector((state) => state.user);
@@ -33,6 +33,9 @@ const TwitterNotification = ({connections, setfetchAgain}) => {
           messsageArray.push(lastMessage.data);
           setReceivedMessages((prev)=>[...prev,messsageArray[0]]);          
         }
+        else{
+          setOpen(true);
+        }
     }  
   }, [lastMessage]);
 return (
@@ -49,7 +52,7 @@ return (
         ))}
       </ul>    
       { open && <Chatting setOpen={setOpen} connections={connections} setfetchAgain={setfetchAgain} sendMessage={sendMessage} 
-                lastMessage={lastMessage} receivedMessages={receivedMessages} setReceivedMessages={setReceivedMessages}/>}
+                lastMessage={lastMessage} receivedMessages={receivedMessages} setReceivedMessages={setReceivedMessages} loading={loading}/>}
     </>
 
   );
