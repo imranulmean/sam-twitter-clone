@@ -21,6 +21,7 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
     const handleClickSendMessage =(connectionId) => {
         let message={chatmessage,connectionId};
          sendMessage(JSON.stringify({"action":"sendMessage", "message":message}));
+         setChatMessage("");
       }
     return (
         <div className="absolute w-full h-full top-0 left-0 bg-transparent flex items-center justify-center">
@@ -30,7 +31,7 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
           </button>
                 <div>
                     <p>Available People to Chat</p>
-                    <button onClick={()=>setfetchAgain(true)}>Get Connected Friends</button>
+                    <button onClick={()=>setfetchAgain(true)} className='bg-blue-500 p-1 rounded-lg uppercase m-1' >Get Connected Friends</button>
                 <ul>
                     {connections.map((c, index) => (
                     <li key={index}>
@@ -38,14 +39,15 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
                            <div className="flex flex-col mr-10">
                                 <img src={c.profilePicture}  className="w-12 h-12 rounded-full"/>
                                 <p>{c.username}</p>
+                                <p>{c._id}</p>
                                 <p>{c.connectionId}</p>
                            </div>
                            {/* { */}
                            {/* currentUser._id != c._id && */}
                             <div className="flex flex-col justify-between">
                                 <textarea className="bg-white rounded-lg w-full mb-5"  maxLength={280} readOnly value={chats}></textarea>
-                                <input type="text" onChange={(e)=>setChatMessage(e.target.value)}/>
-                                <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-red-800 rounded-lg uppercase my-2'> Send Message</button>
+                                <input type="text" onChange={(e)=>setChatMessage(e.target.value)} placeholder="Type Your Message Here"/>
+                                <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-blue-500 rounded-lg uppercase my-2'> Send Message</button>
                             </div>
                            {/* } */}
                         </div>
