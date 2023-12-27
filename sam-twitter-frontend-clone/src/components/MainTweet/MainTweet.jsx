@@ -61,7 +61,6 @@ const MainTweet = () => {
           body: JSON.stringify(createTweetObj)
         });
         const createTweetRes= await submitTweet.json();
-        console.log(createTweetRes);
         setNewTweet(createTweetRes);
         setLoading(false);
         setShowNewTweet(true);
@@ -102,7 +101,10 @@ const MainTweet = () => {
               method:"POST",
               body: JSON.stringify(createTweetObj)
             });
+            const createTweetRes= await submitTweet.json();
+            setNewTweet(createTweetRes);
             setLoading(false);
+            setShowNewTweet(true);
             //window.location.reload(false);
           } catch (err) {
             console.log(err);
@@ -115,8 +117,8 @@ const MainTweet = () => {
   return (
     <div className="top-20">
       {currentUser && (
-        <div>
-          <img src={currentUser.profilePicture} className="h-auto w-8 rounded-full "/>
+        <div className="flex justify-left mb-5">
+          <img src={currentUser.profilePicture} className="h-auto w-16 rounded-full "/>
           <p className="font-bold pl-2 my-2">{currentUser.username}</p>
         </div>
         

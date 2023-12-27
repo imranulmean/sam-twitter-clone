@@ -27,7 +27,7 @@ const Tweet = ({ tweet, setData, userObj, userTweets}) => {
     };
 
    fetchData();
-  }, [tweet.likes]);
+  }, [tweet.likes, tweet]);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -54,17 +54,19 @@ const Tweet = ({ tweet, setData, userObj, userTweets}) => {
 
   const deleteTweet = async (userId, tweetId) => {
     setDeleting(true);
-    const deleteTweetUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/deleteTweet";
-    const deleteTweetObj={userId, tweetId}
-    const deleteTweetres= await fetch(deleteTweetUrl, {
-      method:"POST",
-      headers:{
-        Authorization:currentUser.token
-      },
-      body: JSON.stringify(deleteTweetObj)
-    });
+    // const deleteTweetUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/tweets/deleteTweet";
+    // const deleteTweetObj={userId, tweetId}
+    // const deleteTweetres= await fetch(deleteTweetUrl, {
+    //   method:"POST",
+    //   headers:{
+    //     Authorization:currentUser.token
+    //   },
+    //   body: JSON.stringify(deleteTweetObj)
+    // });
     setDeleting(false);
-    window.location.reload(false);
+    console.log(tweet);
+    
+    // window.location.reload(false);
   }
 
   return (

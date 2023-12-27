@@ -92,7 +92,7 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 ///////////////////////
-const email="imranulhasan73@gmail.com";
+const email="test123@gmail.com";
 const password="123";
 const type="google";
 const profilePicture="123.jpg";
@@ -113,7 +113,7 @@ export const handler = async (event) => {
 
     result= await checkUserExist(email);
    ////////////// If the User Exist check password ///////////////// 
-    
+   
    if(result.Count==1){ 
         
         let tokenObj={email};
@@ -126,11 +126,12 @@ export const handler = async (event) => {
             result = await checkPassword(password, result.Items[0]);
         }
         
-        result["token"]=jwt.sign(tokenObj,tokenSecret);        
+        result=await getData_twitterNewUsers(result._id)
+        result["token"]=jwt.sign(tokenObj,tokenSecret);
     }
     
     else{
-        /// If Google User not exist create New google User 
+        /// If Google User not exist create New google User         
         if(type==="google"){
             const hashPassword= bcrypt.hashSync("2010-2-60-008",10);
             result = await createNewUser(_id, email, username[0],hashPassword,profilePicture);
@@ -140,11 +141,11 @@ export const handler = async (event) => {
                 result = await putDataExistingUser(_id, email, username[0],hashPassword);
             } 
             /////////// Now Login The Googgle User ////////
-            result= await checkUserExist(email);
-            result=result.Items[0];
+            result= await getData_twitterNewUsers(_id);
+            result=result;
             let tokenObj={email};
             let tokenSecret="twitter-clone-token";   
-            result["token"]=jwt.sign(tokenObj,tokenSecret);                
+            result["token"]=jwt.sign(tokenObj,tokenSecret);            
         }
         else{
             result="User Do Not Existis";
@@ -227,8 +228,23 @@ const putDataExistingUser = async (_id,email, username, hashPassword) =>{
     }
 }
 
+const getData_twitterNewUsers= async (userId) =>{
+    let command= new QueryCommand({
+        TableName:"twitterNewUsers",
+        KeyConditionExpression:"#userId=:userId",
+        ExpressionAttributeNames:{
+            "#userId":"_id"
+        },
+        ExpressionAttributeValues:{
+            ":userId":userId
+        }
+    });
 
-//  await handler(event1);
+    let userObj=await docClient.send(command);
+    return userObj.Items[0];
+}
+
+ await handler(event1);
 
 
 

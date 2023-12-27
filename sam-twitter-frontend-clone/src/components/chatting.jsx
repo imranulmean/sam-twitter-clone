@@ -10,18 +10,16 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
     useEffect(() => {
       
         if(lastMessage){
-          console.log("From other end:",lastMessage.data );
+          // console.log(lastMessage.data);          
             let parsedMessage=JSON.parse(lastMessage.data);
-            console.log("parsedMessage:", parsedMessage)            
             let findConnectionIndex=connectionsChat.findIndex(i=>i.connectionId===parsedMessage.sender);
             console.log("findConnectionIndex",findConnectionIndex);
-           if(parsedMessage.type && parsedMessage.type==="chat"){
 
+           if(parsedMessage.type && parsedMessage.type==="chat"){
             if(findConnectionIndex>-1){
               let newMessage=parsedMessage.message;
               connectionsChat[findConnectionIndex]["chat"]=newMessage;
-              setPlaceholder("type your message here");
-              console.log("connectionsChat",connectionsChat);
+              setChatMessage("type your message here");
             }
           }
         }  
@@ -47,31 +45,36 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
                       <button onClick={()=>setfetchAgain(true)} className='bg-blue-500 p-1 rounded-lg uppercase m-1' >Get Connected Friends</button>
                       :<p>Getting Data</p>
                     }
-                <ul>
-                    {connectionsChat.map((c, index) => (
-                    <li key={index}>
-                       <div className="flex justify-left border-b-2 border-stone-500 mb-5">
-                           <div className="flex flex-col mr-10">
-                                <img src={c.profilePicture}  className="w-12 h-12 rounded-full"/>
-                                <p>{c.username}</p>
-                                <p>{c._id}</p>
-                                <p>{c.connectionId}</p>
-                           </div>
-                           {
-                           currentUser._id != c._id &&
-                            <div className="flex flex-col justify-between">
-                                {/* <textarea className="bg-white rounded-lg w-full mb-5"  maxLength={280} readOnly value={c.chat}></textarea> */}
-                                <p>Message: {c.chat}</p>
-                                <form onSubmit={(e) => e.preventDefault()}>
-                                    <input type="text" onChange={(e)=>setChatMessage(e.target.value)} value={chatmessage} placeholder={placeholder}/>
-                                    <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-blue-500 rounded-lg uppercase my-2'> Send Message</button>
-                                </form>
-                            </div>
-                           }
-                        </div>
-                    </li>
-                    ))}
-                </ul>
+                    {
+                      !loading ? 
+                          <ul>
+                          {connectionsChat.map((c, index) => (
+                          <li key={index}>
+                            <div className="flex justify-left border-b-2 border-stone-500 mb-5">
+                                <div className="flex flex-col mr-10">
+                                      <img src={c.profilePicture}  className="w-12 h-12 rounded-full"/>
+                                      <p>{c.username}</p>
+                                      <p>{c._id}</p>
+                                      <p>{c.connectionId}</p>
+                                </div>
+                                {
+                                currentUser._id != c._id &&
+                                  <div className="flex flex-col justify-between">
+                                      {/* <textarea className="bg-white rounded-lg w-full mb-5"  maxLength={280} readOnly value={c.chat}></textarea> */}
+                                      <p>Message: {c.chat}</p>
+                                      <form onSubmit={(e) => e.preventDefault()}>
+                                          <input type="text" onChange={(e)=>setChatMessage(e.target.value)} value={chatmessage} placeholder={placeholder}/>
+                                          <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-blue-500 rounded-lg uppercase my-2'> Send Message</button>
+                                      </form>
+                                  </div>
+                                }
+                              </div>
+                          </li>
+                          ))}
+                      </ul>                      
+                      :<p>Getting Data</p>
+                    }
+
                 </div>
         </div>
       </div>

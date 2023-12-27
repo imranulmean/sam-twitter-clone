@@ -6,7 +6,7 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
 const userId="1703268845825";
-const tweetId="1703310423195";
+const tweetId="1703657535321";
 
 const tweetObj={userId,tweetId}
 
@@ -21,7 +21,6 @@ export const handler = async (event) => {
    const {userId,tweetId}= JSON.parse(event.body);
     /////////////////// Getting Tweets by UserId ///////////
     result= await getTweet(userId, tweetId);
-    console.log("showing result",result);
     let response = {
       statusCode: 200,
       'headers': {
@@ -46,8 +45,29 @@ const getTweet= async (userId, tweetId) =>{
     },
   };
   
-  const getItemCommand = new GetItemCommand(getItemParams);
-    return await docClient.send(getItemCommand);
+  let command = new GetItemCommand(getItemParams);
+  let getTweetRes= await  docClient.send(command);
+  let getUserRes= await getUser(userId);
+  
+  let tweetObj=getTweetRes.Item;
+  let userObj=getUserRes.Items[0];
+  let obj={tweetObj,userObj};
+  return obj;
+}
+
+const getUser= async (userId) =>{
+  let command= new QueryCommand({
+    TableName:"twitterNewUsers",
+    KeyConditionExpression:"#userId=:userId",
+    ExpressionAttributeNames:{
+      "#userId":"_id"
+    },
+    ExpressionAttributeValues:{
+      ":userId":userId
+    }
+  });
+
+  return await docClient.send(command);
 }
  await handler(event1);
 

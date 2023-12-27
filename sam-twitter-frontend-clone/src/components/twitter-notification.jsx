@@ -26,15 +26,17 @@ const TwitterNotification = ({connections, setfetchAgain , loading}) => {
   useEffect(() => {
     
     if(lastMessage){
-
+      // console.log(lastMessage);
       let parsedMessage=JSON.parse(lastMessage.data);
-        if(!parsedMessage.type){
-          let messsageArray=[];
-          messsageArray.push(lastMessage.data);
-          setReceivedMessages((prev)=>[...prev,messsageArray[0]]);          
+        if(parsedMessage.type && parsedMessage.type==="liked" || parsedMessage.type==="followed"){
+          setOpen(false);
+          setReceivedMessages((prev)=>[...prev,parsedMessage.data]);          
         }
-        else{
+        if(parsedMessage.type && parsedMessage.type==="chat"){
           setOpen(true);
+        }
+        if(parsedMessage.type && parsedMessage.type==="fetchAgain"){
+          setfetchAgain(true);
         }
     }  
   }, [lastMessage]);
@@ -45,14 +47,25 @@ return (
     <button className='bg-green-800 p-1 rounded-lg uppercase m-1' onClick={()=>setReceivedMessages([])} >Clear Notification</button>
       <ul>
         {receivedMessages.map((msg, index) => (
-          <li key={index}>
-            <Link to={`/tweetPage/${currentUser._id}/${msg}`}>Someone Liked your tweet {msg}</Link>
-            
+          <li key={index} className="border-b-2 border-stone-500 mb-5">
+            {
+              msg.type =="liked" &&
+              <Link to={`/tweetPage/${currentUser._id}/${msg.tweetId}`}>Someone Liked your tweet {msg.tweetId}</Link>
+            }
+            {
+              msg.type =="followed" &&
+              <Link to={`/profile/${msg.you}`}>User Id: {msg.you} Followed You</Link>
+            }
+            {
+              msg.type =="createTweet" &&
+              <Link to={`/tweetPage/${msg.userId}/${msg.tweetId}`}>User Id: {msg.userId} Created this Tweet:{msg.tweetId} </Link>
+            }            
           </li>
         ))}
       </ul>    
       { open && <Chatting setOpen={setOpen} connections={connections} setfetchAgain={setfetchAgain} sendMessage={sendMessage} 
-                lastMessage={lastMessage} receivedMessages={receivedMessages} setReceivedMessages={setReceivedMessages} loading={loading}/>}
+                lastMessage={lastMessage} receivedMessages={receivedMessages} setReceivedMessages={setReceivedMessages} loading={loading}/>
+      }
     </>
 
   );

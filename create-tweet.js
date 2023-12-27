@@ -1,8 +1,11 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
+const sqsClient = new SQSClient({});
+const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-notification-sqs";
 
 ////////////////////
 const userId="1703289792581";
@@ -59,7 +62,8 @@ const createTweet= async (_id, userId, description, tweetPic, createdAt, updated
       });
       try {
         let createTweetRes= await docClient.send(command);
-        let obj={_id, userId, description, tweetPic, createdAt}
+        let obj={_id, userId, description, tweetPic, createdAt};
+        await insertData_sqs(userId, _id);
         return obj;
       } catch (error) {
           console.log(error);
@@ -84,4 +88,15 @@ const putDataIn_tweetByDates = (tweetId, userId, createdAt, year) =>{
   } 
 }
 
+const insertData_sqs = async(userId, tweetId) =>{
+
+  let mesgObj={userId, tweetId, type:'createTweet'};
+  let command = new SendMessageCommand({
+    QueueUrl: sqsQueueUrl,    
+    MessageBody:JSON.stringify(mesgObj),
+  });
+
+  let response = await sqsClient.send(command);
+  return response;
+}
 // await handler(event1);

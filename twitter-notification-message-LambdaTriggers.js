@@ -40,43 +40,43 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
 
   export const handler = async (event) => {
     let connectionIds;
+    let connectedUserId;
+    let notificationData;
+    let notifyAll=false;
     const messages = event.Records;
 
     if (!messages) {
       return;
     }
        
-    ///// Getting Connections from Dynamo DB /////////
+      ///// Getting Connections from Dynamo DB /////////
       connectionIds = await getConnections(); 
 
       while(messages.length>0){
+        
         let m=messages.pop();       
         let messageBody=JSON.parse(m.body);
-        if(messageBody.type === "liked"){
 
-            for (let c of connectionIds.Items){
-              if(messageBody.userId === c.userId){
-                let requestParams = {
-                  ConnectionId: c.connectionId,
-                  Data: messageBody.tweetId,
-                };
-                let postCommand = new PostToConnectionCommand(requestParams);
-                try {
-                    await client.send(postCommand);           
-                } catch (error) {
-                console.log(error);
-                }
-              }
-          
-          }
+        //////////////////////
+        
+        if(messageBody.type==="liked"){
+          connectedUserId=messageBody.userId;
         }
-        else if(messageBody.type === "followed"){
+        if(messageBody.type === "followed"){
+          connectedUserId=messageBody.toFollowOrUnFollowId;
+        }
+        if(messageBody.type === "createTweet"){
+          notifyAll=true;
+        }
 
+        notificationData={"data":messageBody, "type": messageBody.type};
+
+        if(!notifyAll){
           for (let c of connectionIds.Items){
-            if(messageBody.toFollowOrUnFollowId === c.userId){
+            if(connectedUserId === c.userId){
               let requestParams = {
                 ConnectionId: c.connectionId,
-                Data: `User Id:${messageBody.you} Followed you `,
+                Data: JSON.stringify(notificationData),
               };
               let postCommand = new PostToConnectionCommand(requestParams);
               try {
@@ -85,11 +85,26 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
               console.log(error);
               }
             }
-        
-        }          
+          }
         }
-
-      }  
+      
+        else{
+            for (let c of connectionIds.Items){
+                let requestParams = {
+                  ConnectionId: c.connectionId,
+                  Data: JSON.stringify(notificationData),
+                };
+                let postCommand = new PostToConnectionCommand(requestParams);
+                try {
+                    await client.send(postCommand);           
+                } catch (error) {
+                console.log(error);
+                }
+          }        
+        }
+        ///////////////////////
+        
+      } 
 
     return {
         statusCode: 200,

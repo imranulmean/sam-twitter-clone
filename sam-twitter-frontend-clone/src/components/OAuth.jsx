@@ -34,22 +34,9 @@ export default function OAuth() {
             method:"POST",
             body: JSON.stringify(signinObj)
           })
-          const loginData=await res.json();         
-          //////////Getting User Follower Data
-          const findsUserUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/getuser/${loginData._id}`;
-          // const findsUserUrl= import.meta.env.findsUserUrl+loginData._id;
-          const findUser = await fetch(findsUserUrl,{
-            method:"GET",
-            headers:{
-              Authorization:loginData.token
-            }
-          });
-          
-          const userProfile =await findUser.json();
+          const loginData=await res.json();
           setLoading(false);
-          userProfile.Items[0]["token"]=loginData.token;
-          console.log(userProfile.Items[0]);
-          dispatch(loginSuccess(userProfile.Items[0]));
+          dispatch(loginSuccess(loginData));
           navigate("/");
         } catch (err) {
           dispatch(loginFailed());
