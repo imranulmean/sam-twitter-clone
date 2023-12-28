@@ -1,39 +1,51 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage, loading}) =>{
     const [chatmessage, setChatMessage] = useState("");
-    const {currentUser}= useSelector((state)=>state.user);
-    const [placeholder, setPlaceholder]= useState("Type your message here");
+    const [placeHolder, setplaceHolder]= useState("");
+
+    const {currentUser}= useSelector((state)=>state.user);    
     let connectionsChat=connections;
+    const chatFieldRef= useRef(null);
 
     useEffect(() => {
       
         if(lastMessage){
-          // console.log(lastMessage.data);          
-            let parsedMessage=JSON.parse(lastMessage.data);
-            let findConnectionIndex=connectionsChat.findIndex(i=>i.connectionId===parsedMessage.sender);
-            console.log("findConnectionIndex",findConnectionIndex);
+          setplaceHolder("");
+          setTimeout(()=>{
+              let parsedMessage=JSON.parse(lastMessage.data);
+              let findConnectionIndex=connectionsChat.findIndex(i=>i.connectionId===parsedMessage.sender);
+              console.log("findConnectionIndex",findConnectionIndex);
 
-           if(parsedMessage.type && parsedMessage.type==="chat"){
-            if(findConnectionIndex>-1){
-              let newMessage=parsedMessage.message;
-              connectionsChat[findConnectionIndex]["chat"]=newMessage;
-              setChatMessage("type your message here");
+            if(parsedMessage.type && parsedMessage.type==="chat"){
+              if(findConnectionIndex>-1){
+                let newMessage=" " + parsedMessage.message;
+                if(connectionsChat[findConnectionIndex]["chat"]){
+                  connectionsChat[findConnectionIndex]["chat"]=connectionsChat[findConnectionIndex]["chat"].concat(newMessage);
+                }
+                else{
+                  connectionsChat[findConnectionIndex]["chat"]=newMessage;
+                }
+                
+                setplaceHolder("type your message here");
+              }
             }
-          }
+          },1000);
+          // console.log(lastMessage.data);          
+
         }  
       }, [lastMessage]);    
 
     const handleClickSendMessage =(connectionId) => {
-        
+       
         let message={chatmessage,connectionId};
          sendMessage(JSON.stringify({"action":"sendMessage", "message":message}));
          setChatMessage("");
-         setPlaceholder("");
+        chatFieldRef.current.value="";
       }
     return (
-        <div className="absolute w-full h-full top-0 left-0 bg-transparent flex items-center justify-center">
+        <div className="absolute w-full h-full top-5 left-0 bg-transparent flex items-center justify-center">
         <div className="w-[600px] h-[600px] bg-gray-200 rounded-lg p-8 flex flex-col gap-4 relative">
           <button onClick={() => setOpen(false)} className="absolute top-3 right-3 cursor-pointer">
             X
@@ -47,6 +59,7 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
                     }
                     {
                       !loading ? 
+                        <div className="max-h-[400px] overflow-y-auto">
                           <ul>
                           {connectionsChat.map((c, index) => (
                           <li key={index}>
@@ -63,7 +76,7 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
                                       {/* <textarea className="bg-white rounded-lg w-full mb-5"  maxLength={280} readOnly value={c.chat}></textarea> */}
                                       <p>Message: {c.chat}</p>
                                       <form onSubmit={(e) => e.preventDefault()}>
-                                          <input type="text" onChange={(e)=>setChatMessage(e.target.value)} value={chatmessage} placeholder={placeholder}/>
+                                          <input ref={chatFieldRef} type="text" onChange={(e)=>{setChatMessage(e.target.value)}}  placeholder={placeHolder}/>
                                           <button onClick={()=>handleClickSendMessage(c.connectionId)} className='bg-blue-500 rounded-lg uppercase my-2'> Send Message</button>
                                       </form>
                                   </div>
@@ -71,7 +84,8 @@ const Chatting = ({setOpen, connections, setfetchAgain, sendMessage, lastMessage
                               </div>
                           </li>
                           ))}
-                      </ul>                      
+                      </ul> 
+                     </div>
                       :<p>Getting Data</p>
                     }
 
