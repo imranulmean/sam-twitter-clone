@@ -80,7 +80,8 @@ const Profile = () => {
           }          
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <img src={userProfile?.profilePicture} alt="Profile Picture" className="w-28 h-auto rounded-full" />
+              <img src={userProfile?.profilePicture} alt="Profile Picture" className="w-28 h-auto rounded-full" 
+              style={{ "margin-top":"-35%"}}/>
               <div className="ml-4">
                 <p>{userProfile.username}</p>
                 <p>Joined: {formatDistance(new Date(userProfile.Date), new Date()).toString()}</p>

@@ -26,9 +26,9 @@ const TwitterNotification = ({connections, setfetchAgain , loading}) => {
   useEffect(() => {
     
     if(lastMessage){
-      // console.log(lastMessage);
+      //  console.log(lastMessage.data);
       let parsedMessage=JSON.parse(lastMessage.data);
-        if(parsedMessage.type && parsedMessage.type==="liked" || parsedMessage.type==="followed"){
+        if(parsedMessage.type && parsedMessage.type==="liked" || parsedMessage.type==="followed" || parsedMessage.type==="createTweet"){
           setOpen(false);
           setReceivedMessages((prev)=>[...prev,parsedMessage.data]);          
         }
