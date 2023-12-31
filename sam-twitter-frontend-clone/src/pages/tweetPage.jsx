@@ -6,14 +6,14 @@ import CommentsCards from "../components/CommentsCards";
 
 const TweetPage = () =>{
     const { currentUser } = useSelector((state) => state.user);
-    const { userId, tweetId}=useParams();
+    const { userId, tweetId, createdAt}=useParams();
     const [tweetResult, setTweetResult]= useState({});
     const [userObj, setUserObj]=useState({});
     const [comments, setComments]= useState([]);
       // Get query parameters
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const createdAt = queryParams.get('createdAt');
+  // const location = useLocation();
+  // const queryParams = new URLSearchParams(location.search);
+  // const createdAt = queryParams.get('createdAt');
 
     useEffect(()=>{
        const getTweet= async () =>{
@@ -35,13 +35,13 @@ const TweetPage = () =>{
           console.log(error);
         }
        }
-       getTweet();
-       if(createdAt){
-         console.log("Get Comment:", createdAt)
+       getTweet();       
+       if(createdAt){         
+         loadOneComment();
        }
     },[tweetId])
 
-    const loadComments=async (tweet)=>{      
+    const loadComments=async (tweet)=>{
       const loadCommentsUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/get-comments/${tweet._id.S}`;
       const loadCommentsRes=await fetch (loadCommentsUrl,{
           method:"GET",
@@ -50,9 +50,23 @@ const TweetPage = () =>{
           }
       });
       const result= await loadCommentsRes.json();
-      console.log(result);
       setComments(result);
-    }    
+    }
+
+    const loadOneComment= async()=>{
+      console.log("userId, tweetId, createdAt", userId, tweetId, createdAt);
+      const loadCommentObj={userId, tweetId, createdAt};
+      const loadCommentUrl=`https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/get-one-comment`;
+      const loadCommentRes=await fetch (loadCommentUrl,{
+          method:"POST",
+          headers:{
+              Authorization: currentUser.token
+          },
+          body:JSON.stringify(loadCommentObj)
+      });
+      const result= await loadCommentRes.json();
+      setComments(result);      
+    }
 
     return (
         <>

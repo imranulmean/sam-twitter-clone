@@ -5,9 +5,10 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
+const userId="1703268845825"
 const tweetId="1703806189762";
-const createdAt="2023-12-30T12:02:13.356Z";
-const jsonObj={tweetId,createdAt};
+const createdAt="2023-12-30T12:12:17.781Z";
+const jsonObj={userId, tweetId, createdAt};
 
 const event1={
     body:JSON.stringify(jsonObj)
@@ -15,11 +16,10 @@ const event1={
 ///////////////////////
 export const handler = async (event) => {
 
-  const {tweetId,createdAt}= JSON.parse(event.body);
+  const { userId, tweetId, createdAt}= JSON.parse(event.body);
   let result;
     /////////////////// Creat Tweet with userId and description ///////////
     result=await getOneComment(tweetId, createdAt);  
-    
     let response = {
       statusCode: 200,
       'headers': {

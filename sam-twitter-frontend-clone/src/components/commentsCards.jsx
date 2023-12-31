@@ -52,7 +52,7 @@ const CommentsCards = ({comments, setComments, currentUser}) => {
                                             {c.comment}
                                         </p>
                                         <div className='flex justify-between'>
-                                            <Link to={`/tweetPage/${c.userObj._id}/${c.tweetId}?createdAt=${c.createdAt}`}> 
+                                            <Link to={`/tweetPage/${c.userObj._id}/${c.tweetId}/${c.createdAt}`}> 
                                                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                                                     {formatDistance(new Date(c.createdAt), new Date())}
                                                 </p>                                            
