@@ -26,9 +26,10 @@ const TwitterNotification = ({connections, setfetchAgain , loading}) => {
   useEffect(() => {
     
     if(lastMessage){
-      //  console.log(lastMessage.data);
+      console.log(lastMessage.data);
       let parsedMessage=JSON.parse(lastMessage.data);
-        if(parsedMessage.type && parsedMessage.type==="liked" || parsedMessage.type==="followed" || parsedMessage.type==="createTweet"){
+        if(parsedMessage.type && parsedMessage.type==="liked" || parsedMessage.type==="followed" 
+          || parsedMessage.type==="createTweet" || parsedMessage.type==="commentDone"){
           setOpen(false);
           setReceivedMessages((prev)=>[...prev,parsedMessage.data]);          
         }
@@ -59,7 +60,13 @@ return (
             {
               msg.type =="createTweet" &&
               <Link to={`/tweetPage/${msg.userId}/${msg.tweetId}`}>User Id: {msg.userId} Created this Tweet:{msg.tweetId} </Link>
-            }            
+            }
+            {
+              msg.type =="commentDone" &&
+                <Link to={`/tweetPage/${msg.tweetCreator}/${msg.tweetId}/${new Date(msg.createdAt).getTime().toString()}`}>
+                  <p>Someone Comment on your Tweet</p>
+                </Link>
+            }                     
           </li>
         ))}
       </ul>    

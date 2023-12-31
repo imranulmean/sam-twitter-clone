@@ -65,10 +65,12 @@ const sqsQueueUrl = "https://sqs.us-east-1.amazonaws.com/201814457761/twitter-no
         if(messageBody.type === "followed"){
           connectedUserId=messageBody.toFollowOrUnFollowId;
         }
+        if(messageBody.type === "commentDone"){
+          connectedUserId=messageBody.tweetCreator;
+        }
         if(messageBody.type === "createTweet"){
           notifyAll=true;
         }
-
         notificationData={"data":messageBody, "type": messageBody.type};
 
         if(!notifyAll){

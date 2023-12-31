@@ -23,7 +23,7 @@ const CommectSection = ({tweet}) => {
     }
       
       setCommenting(true);
-      const submitCommentObj={tweetId:tweet._id,comment, userId:currentUser._id, commentPic:""};
+      const submitCommentObj={tweetId:tweet._id,comment, userId:currentUser._id, commentPic:"", tweetCreator:tweet.userId};
       const submitCommentUrl="https://uhsck9agdk.execute-api.us-east-1.amazonaws.com/dev/submitComment";
       const submitCommentRes= await fetch(submitCommentUrl, {
           method:"POST",
@@ -56,7 +56,7 @@ const CommectSection = ({tweet}) => {
     });
     const result= await loadCommentsRes.json();
     setLoading(false);
-    setComments(result);
+    setComments(result);    
     setcommentsLoaded(true);
   }
 

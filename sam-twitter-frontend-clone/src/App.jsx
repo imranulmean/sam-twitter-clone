@@ -86,7 +86,7 @@ export default function App() {
                 <Route path='/signout' element={<Signin />} />
                 <Route path='/profile/:id' element={<Profile />} />
                 <Route path='/tweetPage/:userId/:tweetId' element={<TweetPage />} />
-                {/* <Route path='/tweetPage/:userId/:tweetId/:createdAt' element={<TweetPage />} /> */}
+                <Route path='/tweetPage/:userId/:tweetId/:createdAt' element={<TweetPage />} />
               </Route>        
             </Routes>   
           </div>

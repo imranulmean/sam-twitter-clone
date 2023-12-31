@@ -21,7 +21,7 @@ const event1={
 ///////////////////////
 export const handler = async (event) => {
 
-  const {tweetId, comment, userId, commentPic}= JSON.parse(event.body);
+  const {tweetId, comment, userId, commentPic, tweetCreator}= JSON.parse(event.body);
   let result;
   const createdAt=new Date().toISOString();
   const formatedDate=new Date(createdAt);
@@ -29,7 +29,7 @@ export const handler = async (event) => {
   const month=formatedDate.getMonth() + 1;
   const date=formatedDate.getDate().toString();
   
-    result=await submitComment(tweetId, comment, userId, commentPic,createdAt);    
+    result=await submitComment(tweetId, comment, userId, commentPic, createdAt, tweetCreator);    
     let response = {
       statusCode: 200,
       'headers': {
@@ -43,12 +43,13 @@ export const handler = async (event) => {
   
 };
 
-const submitComment= async (tweetId, comment, userId, commentPic,createdAt) => {
+const submitComment= async (tweetId, comment, userId, commentPic, createdAt, tweetCreator) => {
     let command= new PutCommand({
         TableName:"comments",
         Item:{
           "tweetId":tweetId,
           "userId": userId,
+          "tweetCreator":tweetCreator,
           "comment": comment,
           "commentPic": commentPic,
           "likes":[],     
@@ -57,9 +58,8 @@ const submitComment= async (tweetId, comment, userId, commentPic,createdAt) => {
       });
       try {
         let submitCommentRes= await docClient.send(command);
-        let obj={tweetId, comment, userId, commentPic,createdAt};
-        // await insertData_sqs(userId, _id);
-        console.log(submitCommentRes);
+        let obj={tweetId, comment, userId, commentPic,createdAt,tweetCreator};
+        await insertData_sqs(userId, tweetId, createdAt, tweetCreator);        
         return obj;
       } catch (error) {
           console.log(error);
@@ -67,9 +67,9 @@ const submitComment= async (tweetId, comment, userId, commentPic,createdAt) => {
 }
 
 
-const insertData_sqs = async(userId, tweetId) =>{
+const insertData_sqs = async(userId, tweetId, createdAt, tweetCreator) =>{
 
-  let mesgObj={userId, tweetId, type:'createTweet'};
+  let mesgObj={userId, tweetId, createdAt,tweetCreator,type:'commentDone'};
   let command = new SendMessageCommand({
     QueueUrl: sqsQueueUrl,    
     MessageBody:JSON.stringify(mesgObj),

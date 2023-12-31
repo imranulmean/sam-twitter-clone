@@ -6,7 +6,7 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 ////////////////////
 const userId="1703268845825";
-const tweetId="1703657535321";
+const tweetId="1703806189762";
 
 const tweetObj={userId,tweetId}
 
@@ -21,6 +21,7 @@ export const handler = async (event) => {
    const {userId,tweetId}= JSON.parse(event.body);
     /////////////////// Getting Tweets by UserId ///////////
     result= await getTweet(userId, tweetId);
+    console.log(result);
     let response = {
       statusCode: 200,
       'headers': {

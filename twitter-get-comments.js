@@ -82,15 +82,3 @@ const getUser= async(data) =>{
     return arr;
 }
 
-const insertData_sqs = async(userId, tweetId) =>{
-
-  let mesgObj={userId, tweetId, type:'createTweet'};
-  let command = new SendMessageCommand({
-    QueueUrl: sqsQueueUrl,    
-    MessageBody:JSON.stringify(mesgObj),
-  });
-
-  let response = await sqsClient.send(command);
-  return response;
-}
-await handler(event1);

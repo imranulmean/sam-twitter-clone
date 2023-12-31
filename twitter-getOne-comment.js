@@ -19,7 +19,8 @@ export const handler = async (event) => {
   const { userId, tweetId, createdAt}= JSON.parse(event.body);
   let result;
     /////////////////// Creat Tweet with userId and description ///////////
-    result=await getOneComment(tweetId, createdAt);  
+    result=await getOneComment(tweetId, createdAt);
+    console.log(result);
     let response = {
       statusCode: 200,
       'headers': {
@@ -45,8 +46,37 @@ const getOneComment= async (tweetId, createdAt) => {
       });
     
       const getOneCommentRes = await docClient.send(command);
-      console.log(getOneCommentRes);
-      return getOneCommentRes;
+      let getUserRes= await getUser(getOneCommentRes.Items);
+      return getUserRes;
+}
+
+const getUser= async(data) =>{
+    // console.log(data);
+    const arr=[];  
+    if(data){
+        for(let d of data){
+            let command= new QueryCommand({
+                TableName:"twitterNewUsers",
+                KeyConditionExpression:
+                  "#id= :userId",
+                ExpressionAttributeNames:{
+                    '#id':'_id'
+                },          
+                ExpressionAttributeValues: {
+                  ":userId": d.userId,
+                },
+                 ConsistentRead: true,
+              })
+              try {
+                let userObj=await docClient.send(command);
+                d["userObj"]=userObj.Items[0];
+                arr.push(d);
+              } catch (error) {
+                  console.log(error);
+              }             
+        }
+    }
+    return arr;
 }
 
 await handler(event1);

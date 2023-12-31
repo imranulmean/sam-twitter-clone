@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import formatDistance from "date-fns/formatDistance";
 import { Link } from 'react-router-dom';
 
-const CommentsCards = ({comments, setComments, currentUser}) => {
+const CommentsCards = ({tweetCreator, comments, setComments, currentUser}) => {
 
   const [deleting, setDeleting]= useState(false);  
 
@@ -36,7 +36,8 @@ const CommentsCards = ({comments, setComments, currentUser}) => {
             </div>
             <div class="flow-root">
                     <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                    {
+                    {   
+                        comments && comments.length>0 &&
                         comments.map((c,index)=>{
                         return(
                                 <li class="py-3 sm:py-4" key={index}>
@@ -52,7 +53,7 @@ const CommentsCards = ({comments, setComments, currentUser}) => {
                                             {c.comment}
                                         </p>
                                         <div className='flex justify-between'>
-                                            <Link to={`/tweetPage/${c.userObj._id}/${c.tweetId}/${c.createdAt}`}> 
+                                            <Link to={`/tweetPage/${c.tweetCreator}/${c.tweetId}/${new Date(c.createdAt).getTime().toString()}`}> 
                                                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                                                     {formatDistance(new Date(c.createdAt), new Date())}
                                                 </p>                                            
