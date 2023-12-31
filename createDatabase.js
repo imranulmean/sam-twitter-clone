@@ -7,7 +7,45 @@ export const handler= async ()=>{
     // await twitterExistingUsers();
     // await tweets();
     // await tweetByDates();
-    await twitterNotification();
+    // await twitterNotification();
+    await commentsTable();
+}
+
+const commentsTable= async () =>{
+  let command= new CreateTableCommand({
+    TableName:"comments",
+    AttributeDefinitions:[
+      {
+        AttributeName:"tweetId",
+        AttributeType:"S"
+      },
+      {
+        AttributeName:"createdAt",
+        AttributeType:"S"
+      },
+    ],
+    KeySchema:[
+      {
+        AttributeName:"tweetId",
+        KeyType:"HASH"
+      },
+      {
+        AttributeName:"createdAt",
+        KeyType:"RANGE"
+      }
+    ],
+    ProvisionedThroughput:{
+      ReadCapacityUnits:1,
+      WriteCapacityUnits:1
+    }
+  });
+
+  try {
+    let res=await client.send(command);
+    console.log(res);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 const twitterNotification = async () =>{

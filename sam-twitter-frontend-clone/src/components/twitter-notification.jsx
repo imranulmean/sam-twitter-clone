@@ -42,9 +42,9 @@ const TwitterNotification = ({connections, setfetchAgain , loading}) => {
   }, [lastMessage]);
 return (
     <>
-    <h2>Notification Page</h2>
-    <button onClick={()=>setOpen(true)} className='bg-red-800 p-1 rounded-lg uppercase m-1' > Open Messagebox </button>
-    <button className='bg-green-800 p-1 rounded-lg uppercase m-1' onClick={()=>setReceivedMessages([])} >Clear Notification</button>
+    <p class="mb-2 text-1xl font-bold tracking-tight text-gray-900 dark:text-white">Notification Page</p>
+    <button onClick={()=>setOpen(true)} className='mr-2 p-1 text-xs font-medium text-center text-white rounded-lg bg-[#1da1f2] hover:bg-[#1da1f2]/90'> Open Messagebox </button>
+    <button className='p-1 text-xs font-medium text-center text-white rounded-lg bg-[#1da1f2] hover:bg-[#1da1f2]/90' onClick={()=>setReceivedMessages([])} >Clear Notification</button>
       <ul>
         {receivedMessages.map((msg, index) => (
           <li key={index} className="border-b-2 border-stone-500 mb-5">

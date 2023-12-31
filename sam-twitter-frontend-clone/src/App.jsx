@@ -12,6 +12,7 @@ import LeftSidebar from "./components/LeftSidebar/LeftSidebar";
 import RightSidebar from "./components/RightSidebar/RightSidebar";
 import PrivateRoute from './components/PrivateRoute';
 import { useSelector } from 'react-redux';
+import GetOneComment from "./pages/GetOneComment";
 
 // const Layout = () => {
 //   return (
@@ -85,17 +86,15 @@ export default function App() {
                 <Route path='/signout' element={<Signin />} />
                 <Route path='/profile/:id' element={<Profile />} />
                 <Route path='/tweetPage/:userId/:tweetId' element={<TweetPage />} />
+                {/* <Route path='/comment/:tweetId/:createdAt' element={<GetOneComment />} /> */}
               </Route>        
             </Routes>   
           </div>
           <div className="px-6">
             {currentUser !==null &&<RightSidebar />}
           </div>
-        </div>        
-
-      
+        </div>
     </BrowserRouter>
-
   
   );
 }

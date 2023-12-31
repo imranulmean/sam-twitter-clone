@@ -24,6 +24,10 @@
     "getTweet": "nodemon twitter-getTweet.js",
     "chatConnections": "nodemon twitter-chatConnections.js",
     "chat": "nodemon twitter-chat.js",
+    "submitComment": "nodemon twitter-submit-comment.js",
+    "getComment": "nodemon twitter-get-comments.js",
+    "getOneComment": "nodemon twitter-getOne-comment.js",
+    "deleteComment": "nodemon twitter-delete-comment.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
