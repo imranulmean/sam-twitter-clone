@@ -1,6 +1,7 @@
 import { CreateTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import { ApiGatewayManagementApiClient, PostToConnectionCommand, } from "@aws-sdk/client-apigatewaymanagementapi";
 
 //////////////////////////////
     const connectionId= 'P6zc0daGoAMCJDQ=';
@@ -16,10 +17,14 @@ import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 }
 /////////////////////////////////
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+const dynamoDbclient = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(dynamoDbclient);
 const connectionSqsUrl="https://sqs.us-east-1.amazonaws.com/201814457761/twitter-connections-sqs";
 const sqsClient = new SQSClient({});
+const domain = '51czt4rjh0.execute-api.us-east-1.amazonaws.com';
+const stage = 'production';
+const callbackUrl = `https://${domain}/${stage}`;
+const client = new ApiGatewayManagementApiClient({ endpoint: callbackUrl });
 
 export const handler = async (event) => {
     // console.log(event);
@@ -52,10 +57,44 @@ const putData_twitterNotification = async(connectionId,userId) =>{
     });
     try {
         let putDataRes= await docClient.send(command);
+        let connectionIds = await getConnections();
+        let notificationData={"data":{}, "type": "fetchAgain"};
+        for (let c of connectionIds.Items){        
+           let requestParams = {
+             ConnectionId: c.connectionId,
+             Data: JSON.stringify(notificationData),
+           };
+           let postCommand = new PostToConnectionCommand(requestParams);
+           try {
+               await client.send(postCommand);           
+           } catch (error) {
+           console.log(error);
+           }         
+       }         
         return putDataRes;
     } catch (error) {
         console.log("Showgin Error When Putting data",error)
     }
+}
+
+const getConnections = async () =>{
+    const createdAt=new Date().toISOString();
+    const formatedDate=new Date(createdAt);
+    const year=formatedDate.getFullYear().toString();
+    const date=formatedDate.getDate().toString();
+    const connectionDate=`${year}`;
+
+    let command= new QueryCommand({
+        TableName:"twitter-notification",
+        KeyConditionExpression: "connectionDate=:connectionDate",
+        ExpressionAttributeValues:{
+            ":connectionDate":connectionDate
+        },
+        ConsistentRead: true,
+    });
+    const getConnections= await docClient.send(command);
+
+    return getConnections;
 }
 
 handler(event1);
