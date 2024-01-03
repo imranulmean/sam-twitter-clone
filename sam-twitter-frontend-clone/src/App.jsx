@@ -13,6 +13,8 @@ import RightSidebar from "./components/RightSidebar/RightSidebar";
 import PrivateRoute from './components/PrivateRoute';
 import { useSelector } from 'react-redux';
 import GetOneComment from "./pages/GetOneComment";
+import GeneratePdf from "./pages/GeneratePdf";
+
 
 // const Layout = () => {
 //   return (
@@ -87,6 +89,7 @@ export default function App() {
                 <Route path='/profile/:id' element={<Profile />} />
                 <Route path='/tweetPage/:userId/:tweetId' element={<TweetPage />} />
                 <Route path='/tweetPage/:userId/:tweetId/:createdAt' element={<TweetPage />} />
+                <Route path='/generatePdf' element={<GeneratePdf/>} />
               </Route>        
             </Routes>   
           </div>
