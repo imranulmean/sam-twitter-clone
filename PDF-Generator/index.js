@@ -11,7 +11,7 @@ app.get("/", async(req,res)=>{
 });
 
 app.post('/generateResume', async (req, res) => {
-
+      
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(req.body);

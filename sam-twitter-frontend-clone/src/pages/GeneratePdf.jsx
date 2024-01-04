@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 
 const GeneratePdf = () => {
   const [resumeData, setResumeData] = useState({
@@ -20,10 +21,7 @@ const testData= async()=>{
     try {
       const response = await axios.post('http://localhost:3000/generateResume', resumeData, { responseType: 'arraybuffer' });
       const blob = new Blob([response.data], { type: 'application/pdf' });      
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = 'resume.pdf';
-      link.click();
+      saveAs(blob,"resume.pdf")
     } catch (error) {
       console.error(error);
     }
