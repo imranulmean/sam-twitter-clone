@@ -12,7 +12,6 @@ app.get("/", async(req,res)=>{
 
 app.post('/generateResume', async (req, res) => {
 
-      console.log(req.body);
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(req.body);
@@ -21,7 +20,7 @@ app.post('/generateResume', async (req, res) => {
       await browser.close();
 
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename=generated.pdf');
+      // res.setHeader('Content-Disposition', 'attachment; filename=generated.pdf');
       res.send(pdfBuffer);
     });
 
