@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
+import ChattingMern from '../components/chatting-mern';
+import VideoTranscoder from '../components/videoTranscoder';
 
 const GeneratePdf = () => {
   const [resumeData, setResumeData] = useState({
@@ -13,14 +15,10 @@ const GeneratePdf = () => {
     const { name, value } = e.target;
     setResumeData({ ...resumeData, [name]: value });
   };
-const testData= async()=>{
-    const getData= await fetch("http://localhost:3000/");
-    console.log(await getData.json());
-}
   const handleGeneratePDF = async () => {
     try {
       const response = await axios.post('http://localhost:3000/generateResume', resumeData, { responseType: 'arraybuffer' });
-      const blob = new Blob([response.data], { type: 'application/pdf' });      
+      const blob = new Blob([response.data], { type: 'application/pdf' });
       saveAs(blob,"resume.pdf")
     } catch (error) {
       console.error(error);
@@ -45,7 +43,8 @@ const testData= async()=>{
       </label>
       <br />
       <button onClick={handleGeneratePDF}>Generate PDF</button>
-      <button onClick={testData}>Test get Data</button>
+      <ChattingMern />
+      <VideoTranscoder />
     </div>
   );
 };

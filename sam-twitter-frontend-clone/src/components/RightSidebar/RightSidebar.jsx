@@ -43,7 +43,7 @@ const RightSidebar = () => {
         <p className="font-bold">#ravenclaw</p>      
       </div> */}
       <div className="w-full">
-       <TwitterNotification connections={connections} setfetchAgain={setfetchAgain} loading={loading}></TwitterNotification>
+       {/* <TwitterNotification connections={connections} setfetchAgain={setfetchAgain} loading={loading}></TwitterNotification> */}
       </div>
       
     </>
